@@ -17,7 +17,7 @@ import (
 var db *sql.DB
 var err error
 
-var templates = template.Must(template.ParseFiles("views/index.html"))
+var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html"))
 
 // Variable declarations for users.
 type user struct {
@@ -35,9 +35,18 @@ type user struct {
 	YeahNotifications bool
 }
 
+//Variable declarations for communities.
+type community struct {
+	ID          int
+	Title       string
+	Description string
+	Icon        string
+	Banner      string
+}
+
 // Initialize database.
 func connect() {
-	db, err = sql.Open("mysql", "root:password@tcp(127.0.0.1)/slaj")
+	db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1)/slaj")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -125,8 +134,39 @@ func index(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/act/login", 301)
 	}
 
-	var data = map[string]string{
-		"username": session.GetString("username"),
+	users := QueryUser(session.GetString("username"))
+
+	featured_rows, _ := db.Query("SELECT id, title, icon, banner FROM communities WHERE is_featured = 1 LIMIT 4")
+	var featured []community
+
+	for featured_rows.Next() {
+		var row = community{}
+
+		err = featured_rows.Scan(&row.ID, &row.Title, &row.Icon, &row.Banner)
+		if err != nil {
+			fmt.Println(err)
+		}
+		featured = append(featured, row)
+	}
+
+	community_rows, _ := db.Query("SELECT id, title, icon, banner FROM communities ORDER BY id DESC LIMIT 6")
+	var communities []community
+
+	for community_rows.Next() {
+		var row = community{}
+
+		err = community_rows.Scan(&row.ID, &row.Title, &row.Icon, &row.Banner)
+		if err != nil {
+			fmt.Println(err)
+		}
+		communities = append(communities, row)
+	}
+
+	var data = map[string]interface{}{
+		"Title":       "Communities",
+		"User":        users,
+		"Featured":    featured,
+		"Communities": communities,
 	}
 
 	err := templates.ExecuteTemplate(w, "index.html", data)

@@ -1,9 +1,65 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
-</head>
-<body>
-    <p>ok you are signed in as {{ .username }}</p>
-</body>
-</html>
+{{template "header.html" .}}
+<div id="container">
+	<div id="main-body" class="guest-top " csrf-token="">
+		<h1 style="font-size: 110px">ok you are signed in as {{ .User.Username }}</h1>
+		<div class="community-main">
+			<div id="community-eyecatch"></div>
+		</div>
+		<div class="community-top-sidebar">
+			<form action="/communities.search" class="search">
+				<input maxlength="32" name="query" placeholder="Search all communities" type="text"><input title="Search" type="submit" value="q">
+			</form>
+
+			<div class="post-list-outline index-memo">
+				<h2 class="label">slaj?</h2>
+				<h2>What is slaj?</h2>
+				slaj
+				<p></p>
+			</div>
+		</div>
+
+		<div class="community-main">
+			<h3 class="community-title">Featured Communities</h3>
+			<ul class="list community-list community-card-list test-community-list-item">
+				{{range $feature := .Featured}}
+					<li class="trigger" data-href="/communities/{{$feature.ID}}">
+						<img src="{{$feature.Banner}}" class="community-list-cover">
+						<div class="community-list-body">
+							<span class="icon-container">
+								<img class="icon" src="{{$feature.Icon}}">
+							</span>
+							<div class="body">
+								<a class="title" href="/communities/{{$feature.ID}}">{{$feature.Title}}</a>
+							</div>
+						</div>
+					</li>
+				{{end}}
+			</ul>
+			<h3 class="community-title">General Communities</h3>
+			<ul class="list community-list community-card-list device-new-community-list">
+				{{range $community := .Communities}}
+					<li class="trigger" data-href="/communities/{{$community.ID}}">
+						<div class="community-list-body">
+							<span class="icon-container">
+								<img class="icon" src="{{$community.Icon}}">
+							</span>
+							<div class="body">
+								<a class="title" href="/communities/{{$community.ID}}">{{$community.Title}}</a>
+							</div>
+						</div>
+					</li>
+				{{end}}
+			</ul>
+			<a href="/communities/all" class="big-button">Show more</a>
+		</div>
+		<div id="community-guide-footer">
+			<div id="guide-menu">
+				<a class="arrow-button" href="/help/rules"><span>slaj Rules</span></a>
+				<a class="arrow-button" href="/help/legal"><span>Legal information</span></a>
+				<a class="arrow-button" href="/help/contact"><span>Contact information</span></a>
+				<a class="arrow-button" href="https://pf2m.com/openverse/"><span>Info about slaj</span></a>
+			</div>
+		</div>
+	</div>
+</div>
+{{template "footer.html"}}
