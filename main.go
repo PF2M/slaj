@@ -17,6 +17,8 @@ import (
 var db *sql.DB
 var err error
 
+var templates = template.Must(template.ParseFiles("views/index.html"))
+
 // Variable declarations for users.
 type user struct {
 	ID                int
@@ -114,9 +116,6 @@ func QueryUser(username string) user {
 			&users.Color,
 			&users.YeahNotifications,
 		)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
 	return users
 }
 
@@ -130,13 +129,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 		"username": session.GetString("username"),
 	}
 
-	var t, err = template.ParseFiles("views/index.html")
+	err := templates.ExecuteTemplate(w, "index.html", data)
 	if err != nil {
-		fmt.Println(err.Error())
-		return
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-
-	t.Execute(w, data)
 	return
 }
 
