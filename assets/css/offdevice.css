@@ -4826,7 +4826,7 @@ div#activity-feed-tutorial.no-content p.tleft {
 .digest .post .user-name,
 .digest .post .timestamp-container,
 .digest .post .accepting,
-.digest .post .post-meta .empathy-button,
+.digest .post .post-meta .yeah-button,
 .digest .post .post-meta .played,
 .digest .post .topic-body {
   display: none;
@@ -5321,21 +5321,21 @@ div#activity-feed-tutorial.no-content p.tleft {
   margin-left: 8px;
   vertical-align: middle;
 }
-.post-meta .empathy-added + .empathy,
-.reply-meta .empathy-added + .empathy {
+.post-meta .yeah-added + .yeah,
+.reply-meta .yeah-added + .yeah {
   color: #3caa00;
 }
-.post-meta .empathy:before,
-.reply-meta .empathy:before {
+.post-meta .yeah:before,
+.reply-meta .yeah:before {
   content: "e";
   margin-right: 3px;
 }
-.post-meta .empathy-added + .empathy:before,
-.reply-meta .empathy-added + .empathy:before {
+.post-meta .yeah-added + .yeah:before,
+.reply-meta .yeah-added + .yeah:before {
   color: #5ac800;
 }
-.ie8-earlier .post-meta .empathy.changing:before,
-.ie8-earlier .reply-meta .empathy.changing:before {
+.ie8-earlier .post-meta .yeah.changing:before,
+.ie8-earlier .reply-meta .yeah.changing:before {
   content: none;
 }
 .post-meta .reply:before,
@@ -5351,7 +5351,7 @@ div#activity-feed-tutorial.no-content p.tleft {
 .reply-meta .played:before {
   content: "D";
 }
-.empathy-button {
+.yeah-button {
   float: left;
   display: inline-block;
   *display: inline;
@@ -5375,7 +5375,7 @@ div#activity-feed-tutorial.no-content p.tleft {
   -o-box-shadow: inset 0 1px 0 #fff;
   box-shadow: inset 0 1px 0 #fff;
 }
-.empathy-button:hover {
+.yeah-button:hover {
   text-decoration: none;
   -webkit-box-shadow: inset 0 1px 0 #fff, 0 2px 4px rgba(0,0,0,0.1);
   -moz-box-shadow: inset 0 1px 0 #fff, 0 2px 4px rgba(0,0,0,0.1);
@@ -5383,7 +5383,7 @@ div#activity-feed-tutorial.no-content p.tleft {
   -o-box-shadow: inset 0 1px 0 #fff, 0 2px 4px rgba(0,0,0,0.1);
   box-shadow: inset 0 1px 0 #fff, 0 2px 4px rgba(0,0,0,0.1);
 }
-.empathy-button:before {
+.yeah-button:before {
   content: "E";
   font-size: 16px;
   color: #969696;
@@ -5394,21 +5394,21 @@ div#activity-feed-tutorial.no-content p.tleft {
   *zoom: 1;
   vertical-align: middle;
 }
-.empathy-button:disabled {
+.yeah-button:disabled {
   color: #ddd;
   cursor: default;
 }
-.empathy-button:disabled:before {
+.yeah-button:disabled:before {
   color: #ddd;
 }
-.empathy-button:disabled:hover {
+.yeah-button:disabled:hover {
   -webkit-box-shadow: inset 0 1px 0 #fff;
   -moz-box-shadow: inset 0 1px 0 #fff;
   -ms-box-shadow: inset 0 1px 0 #fff;
   -o-box-shadow: inset 0 1px 0 #fff;
   box-shadow: inset 0 1px 0 #fff;
 }
-.empathy-container a:before {
+.yeah-container a:before {
   content: "e";
   font-size: 16px;
   color: #5ac800;
@@ -5419,18 +5419,18 @@ div#activity-feed-tutorial.no-content p.tleft {
   *zoom: 1;
   vertical-align: middle;
 }
-.empathy-body {
+.yeah-body {
   font-size: 16px;
 }
-.empathy-body a {
+.yeah-body a {
   color: #5ac800;
 }
-.other-empathy-cotainer {
+.other-yeah-cotainer {
   text-align: right;
   padding-bottom: 10px;
   padding-top: 5px;
 }
-.other-empathy-cotainer a {
+.other-yeah-cotainer a {
   color: #323232;
   font-size: 12px;
 }
@@ -5836,7 +5836,7 @@ div#activity-feed-tutorial.no-content p.tleft {
   margin-left: 0;
   padding: 0;
 }
-.post-body .multi-timeline-post-list .post-subtype-artwork .empathy-button {
+.post-body .multi-timeline-post-list .post-subtype-artwork .yeah-button {
   display: none;
 }
 .post-body .multi-timeline-post-list .post-subtype-artwork .hidden-content {
@@ -5894,7 +5894,7 @@ div#activity-feed-tutorial.no-content p.tleft {
   padding: 5px 0 0 0;
 }
 .multi-timeline-post-list .post-subtype-topic .icon-container,
-.multi-timeline-post-list .post-subtype-topic .empathy-button {
+.multi-timeline-post-list .post-subtype-topic .yeah-button {
   display: none;
 }
 .multi-timeline-post-list .post-subtype-topic.post.with-image .body {
@@ -6166,7 +6166,7 @@ h2.label-topic_post .label-topic_post-msgid {
   min-width: 50%;
   margin: 0 0 10px;
 }
-#empathy-content {
+#yeah-content {
   clear: both;
   *zoom: 1;
   position: relative;
@@ -6180,12 +6180,12 @@ h2.label-topic_post .label-topic_post-msgid {
   -o-border-radius: 5px;
   border-radius: 5px;
 }
-#empathy-content:after {
+#yeah-content:after {
   content: "";
   display: block;
   clear: both;
 }
-#empathy-content:before {
+#yeah-content:before {
   content: '';
   position: absolute;
   display: block;
@@ -6193,21 +6193,21 @@ h2.label-topic_post .label-topic_post-msgid {
   height: 7px;
   top: -6px;
   left: 22px;
-  background: url('/img/balloon-part-empathy.png?GXwAkHrU_NISgJHXZBTBpg') no-repeat 0 0;
+  background: url('/img/balloon-part-yeah.png?GXwAkHrU_NISgJHXZBTBpg') no-repeat 0 0;
   -webkit-background-size: 10px 7px;
   -moz-background-size: 10px 7px;
   -ms-background-size: 10px 7px;
   -o-background-size: 10px 7px;
   background-size: 10px 7px;
 }
-#empathy-content .post-permalink-feeling-icon {
+#yeah-content .post-permalink-feeling-icon {
   float: left;
   display: block;
   width: 48px;
   height: 48px;
   margin: 2px;
 }
-#empathy-content .post-permalink-feeling-icon img {
+#yeah-content .post-permalink-feeling-icon img {
   width: 46px;
   height: 46px;
   border: 1px solid #ddd;
@@ -6219,7 +6219,7 @@ h2.label-topic_post .label-topic_post-msgid {
   border-radius: 5px;
 }
 #post-content + .buttons-content,
-#empathy-content.none + .buttons-content {
+#yeah-content.none + .buttons-content {
   border-top: 1px solid #ddd;
 }
 .buttons-content .post-social-buttons-wrapper {
@@ -6397,7 +6397,7 @@ h2.label-topic_post .label-topic_post-msgid {
 .reply-permalink-post {
   padding: 15px;
 }
-.reply-permalink-post #empathy-content {
+.reply-permalink-post #yeah-content {
   margin: 10px 0;
 }
 .reply-permalink-post .reply-content-memo .post-memo {
@@ -8276,7 +8276,7 @@ body.search .search-content p.note {
   .simple-wrapper.simple-wrapper-content #main-body {
     border: none;
   }
-  #empathy-content .icon-container.official-user:after,
+  #yeah-content .icon-container.official-user:after,
   #reply-content .icon-container.official-user:after,
   .news-list .icon-container.official-user:after {
     content: url("/img/official-user-mini.png?x0Bort0kL7ZYsffoDnNvnA");
@@ -8342,7 +8342,7 @@ body.search .search-content p.note {
     display: inline-block;
   }
   #post-content + .buttons-content,
-  #empathy-content + .buttons-content {
+  #yeah-content + .buttons-content {
     padding: 10px;
   }
   .reply-list .reply-meta .button,
@@ -9062,16 +9062,16 @@ body.search .search-content p.note {
   #post-content #close-topic-post {
     margin-top: 10px;
   }
-  #empathy-content {
+  #yeah-content {
     margin: 0 10px;
     padding: 4px 5px 4px;
   }
-  #empathy-content .post-permalink-feeling-icon {
+  #yeah-content .post-permalink-feeling-icon {
     width: 38px;
     height: 38px;
     margin: 2px 1.5px 1px 1.5px;
   }
-  #empathy-content .post-permalink-feeling-icon img {
+  #yeah-content .post-permalink-feeling-icon img {
     width: 36px;
     height: 36px;
   }

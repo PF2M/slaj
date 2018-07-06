@@ -7,9 +7,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gorilla/mux"
 	sessions "github.com/kataras/go-sessions"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -17,7 +19,7 @@ import (
 var db *sql.DB
 var err error
 
-var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html"))
+var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/create_post.html"))
 
 // Variable declarations for users.
 type user struct {
@@ -35,18 +37,38 @@ type user struct {
 	YeahNotifications bool
 }
 
-//Variable declarations for communities.
+// Variable declarations for posts.
+type post struct {
+	ID             int
+	CreatedBy      int
+	CreatedAt      string
+	Body           string
+	Image          string
+	URL            string
+	IsSpoiler      bool
+	IsRm           bool
+	IsRmByAdmin    bool
+	PosterUsername string
+	PosterNickname string
+	PosterIcon     string
+}
+
+// Variable declarations for communities.
 type community struct {
-	ID          int
-	Title       string
-	Description string
-	Icon        string
-	Banner      string
+	ID            int
+	Title         string
+	Description   string
+	Icon          string
+	Banner        string
+	IsFeatured    bool
+	DeveloperOnly bool
+	StaffOnly     bool
+	IsRm          bool
 }
 
 // Initialize database.
 func connect() {
-	db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1)/slaj")
+	db, err = sql.Open("mysql", "root:password@tcp(127.0.0.1)/slaj")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -58,14 +80,20 @@ func connect() {
 
 // Define routes.
 func routes() {
+	// Initialize router.
+	r := mux.NewRouter()
 	// Index route.
-	http.HandleFunc("/", index)
+	r.HandleFunc("/", index)
 	// Auth routes.
-	http.HandleFunc("/act/register", register)
-	http.HandleFunc("/act/login", login)
-	http.HandleFunc("/act/logout", logout)
+	r.HandleFunc("/act/register", register)
+	r.HandleFunc("/act/login", login)
+	r.HandleFunc("/act/logout", logout)
+	// Community routes.
+	r.HandleFunc("/communities/{id:[0-9]+}", showCommunity)
+	r.HandleFunc("/communities/{id:[0-9]+}/posts", createPost).Methods("POST")
 	// Serve static assets.
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+	http.Handle("/", r)
 }
 
 // Main function.
@@ -128,6 +156,64 @@ func QueryUser(username string) user {
 	return users
 }
 
+// Find a post by ID.
+func QueryPost(id int) post {
+	var posts = post{}
+	err = db.QueryRow(`
+		SELECT id,
+		created_by,
+		created_at,
+		body,
+		image,
+		url,
+		is_spoiler,
+		is_rm,
+		is_rm_by_admin
+		FROM posts WHERE id = ?
+		`, id).
+		Scan(
+			&posts.ID,
+			&posts.CreatedBy,
+			&posts.CreatedAt,
+			&posts.Body,
+			&posts.Image,
+			&posts.URL,
+			&posts.IsSpoiler,
+			&posts.IsRm,
+			&posts.IsRmByAdmin,
+		)
+	return posts
+}
+
+// Find a community by ID.
+func QueryCommunity(id string) community {
+	var communities = community{}
+	err = db.QueryRow(`
+		SELECT id,
+		title,
+		description,
+		icon,
+		banner,
+		is_featured,
+		developer_only,
+		staff_only,
+		rm
+		FROM communities WHERE id = ?
+		`, id).
+		Scan(
+			&communities.ID,
+			&communities.Title,
+			&communities.Description,
+			&communities.Icon,
+			&communities.Banner,
+			&communities.IsFeatured,
+			&communities.DeveloperOnly,
+			&communities.StaffOnly,
+			&communities.IsRm,
+		)
+	return communities
+}
+
 func index(w http.ResponseWriter, r *http.Request) {
 	session := sessions.Start(w, r)
 	if len(session.GetString("username")) == 0 {
@@ -162,18 +248,96 @@ func index(w http.ResponseWriter, r *http.Request) {
 		communities = append(communities, row)
 	}
 
+	pjax := r.Header.Get("X-PJAX") == ""
+
 	var data = map[string]interface{}{
 		"Title":       "Communities",
+		"Pjax":        pjax,
 		"User":        users,
 		"Featured":    featured,
 		"Communities": communities,
 	}
-
 	err := templates.ExecuteTemplate(w, "index.html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	return
+}
+
+func showCommunity(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("cache-control", "no-store, no-cache, must-revalidate")
+	session := sessions.Start(w, r)
+
+	if len(session.GetString("username")) == 0 {
+		http.Redirect(w, r, "/act/login", 301)
+	}
+
+	users := QueryUser(session.GetString("username"))
+
+	id := strings.Split(r.URL.RequestURI(), "/communities/")
+	communities := QueryCommunity(id[1])
+
+	post_rows, _ := db.Query("SELECT posts.id, created_by, created_at, body, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE community_id = ? ORDER BY created_at DESC LIMIT 50", id[1])
+	var posts []post
+
+	for post_rows.Next() {
+		var row = post{}
+
+		err = post_rows.Scan(&row.ID, &row.CreatedBy, &row.CreatedAt, &row.Body, &row.PosterUsername, &row.PosterNickname, &row.PosterIcon)
+		if err != nil {
+			fmt.Println(err)
+		}
+		posts = append(posts, row)
+	}
+
+	pjax := r.Header.Get("X-PJAX") == ""
+
+	var data = map[string]interface{}{
+		"Title":     communities.Title,
+		"Pjax":      pjax,
+		"User":      users,
+		"Community": communities,
+		"Posts":     posts,
+	}
+
+	err := templates.ExecuteTemplate(w, "communities.html", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return
+}
+
+func createPost(w http.ResponseWriter, r *http.Request) {
+	session := sessions.Start(w, r)
+
+	user_id := session.GetString("user_id")
+	community_id := r.FormValue("community")
+	body := r.FormValue("body")
+
+	stmt, err := db.Prepare("INSERT posts SET created_by=?, community_id=?, body=?")
+	if err == nil {
+		// If there's no errors, we can go ahead and execute the statement.
+		_, err := stmt.Exec(&user_id, &community_id, &body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		var posts = post{}
+		db.QueryRow("SELECT posts.id, created_by, created_at, body, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE created_by = ? ORDER BY created_at DESC LIMIT 1", user_id).
+			Scan(&posts.ID, &posts.CreatedBy, &posts.CreatedAt, &posts.Body, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
+
+		var data = map[string]interface{}{
+			"Post": posts,
+		}
+
+		err = templates.ExecuteTemplate(w, "create_post.html", data)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
 }
 
 func register(w http.ResponseWriter, r *http.Request) {
@@ -246,6 +410,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	if password_compare == nil {
 		session := sessions.Start(w, r)
 		session.Set("username", users.Username)
+		session.Set("user_id", users.ID)
 		http.Redirect(w, r, "/", 302)
 	} else {
 		http.Redirect(w, r, "/act/login", 302)
