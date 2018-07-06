@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"strconv"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -19,7 +20,7 @@ import (
 var db *sql.DB
 var err error
 
-var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/create_post.html"))
+var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/post.html", "views/create_post.html"))
 
 // Variable declarations for users.
 type user struct {
@@ -41,6 +42,7 @@ type user struct {
 type post struct {
 	ID             int
 	CreatedBy      int
+	CommunityID	   int
 	CreatedAt      string
 	Body           string
 	Image          string
@@ -88,6 +90,8 @@ func routes() {
 	r.HandleFunc("/act/register", register)
 	r.HandleFunc("/act/login", login)
 	r.HandleFunc("/act/logout", logout)
+	// Post routes.
+	r.HandleFunc("/posts/{id:[0-9]+}", showPost)
 	// Community routes.
 	r.HandleFunc("/communities/{id:[0-9]+}", showCommunity)
 	r.HandleFunc("/communities/{id:[0-9]+}/posts", createPost).Methods("POST")
@@ -157,11 +161,12 @@ func QueryUser(username string) user {
 }
 
 // Find a post by ID.
-func QueryPost(id int) post {
+func QueryPost(id string) post {
 	var posts = post{}
 	err = db.QueryRow(`
 		SELECT id,
 		created_by,
+		community_id,
 		created_at,
 		body,
 		image,
@@ -174,6 +179,7 @@ func QueryPost(id int) post {
 		Scan(
 			&posts.ID,
 			&posts.CreatedBy,
+			&posts.CommunityID,
 			&posts.CreatedAt,
 			&posts.Body,
 			&posts.Image,
@@ -301,6 +307,36 @@ func showCommunity(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err := templates.ExecuteTemplate(w, "communities.html", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return
+}
+
+func showPost(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("cache-control", "no-store, no-cache, must-revalidate")
+	session := sessions.Start(w, r)
+
+	if len(session.GetString("username")) == 0 {
+		http.Redirect(w, r, "/act/login", 301)
+	}
+
+	users := QueryUser(session.GetString("username"))
+
+	id := strings.Split(r.URL.RequestURI(), "/posts/")
+	posts := QueryPost(id[1])
+
+	community := QueryCommunity(strconv.Itoa(posts.CommunityID))
+	pjax := r.Header.Get("X-PJAX") == ""
+
+	var data = map[string]interface{}{
+		"Title":     posts.CreatedBy,
+		"Pjax":      pjax,
+		"User":      users,
+		"Community": community,
+		"Post":      posts,
+	}
+	err := templates.ExecuteTemplate(w, "post.html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

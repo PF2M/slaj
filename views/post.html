@@ -1,0 +1,44 @@
+{{if .Pjax}}
+	{{template "header.html" .}}
+{{end}}
+<div id="main-body">
+    <div class="main-column">
+        <div class="post-list-outline">
+            <section id="post-content" class="post post-subtype-default">
+                <header class="community-container">
+                    <h1 class="community-container-heading">
+                        <a href="/communities/{{.Post.CommunityID}}"><img src="{{.Community.Icon}}" width="16px" height="16px">{{.Community.Title}}</a>
+                    </h1>
+                </header>
+                <div class="user-content">
+                    <a href="/users/{{.Post.CreatedBy}}" class="icon-container"><img src="https://pixy.org/images/placeholder.png" class="icon"></a>
+                    <div class="user-name-content">
+                        <p class="user-name">
+                            <a href="/users/{{.Post.CreatedBy}}">{{.Post.CreatedBy}} (will add nicknames later)</a>
+                            <span class="user-id">{{.Post.CreatedBy}} (will add usernames later)</span>
+                        </p>
+                        <p class="timestamp-container">
+                            <span class="timestamp">{{.Post.CreatedAt}} (will add human timestamps later)</span>
+                            <span class="spoiler-status">·Spoilers</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="body">
+                    <p class="post-content-text">{{.Post.Body}}</p>
+                    <div class="post-meta">
+                        <button type="button" class="symbol submit yeah-button" data-feeling="" data-action="/posts/{{.Post.ID}}/yeah" data-url-id="{{.Post.ID}}"><span class="yeah-button-text">Yeah!</span></button>
+                        <div class="empathy symbol">
+                            <span class="symbol-label">Yeahs</span>
+                            <span class="empathy-count">0</span>
+                        </div>
+                        <div class="reply symbol">
+                            <span class="symbol-label">Comment</span>
+                            <span class="reply-count">0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{{template "footer.html"}}
