@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 {{if .Pjax}}
     {{template "header.html" .}}
 {{end}}
+=======
+{{template "header.html" .}}
+>>>>>>> eca8e33aed99c3b7edba2bcd2d3ea7703a88ae65
 <div id="container">
     <div id="main-body" class="community-top" csrf-token="">
         <div id="sidebar">
@@ -24,6 +28,7 @@
         <div class="main-column">
             <div class="post-list-outline">
                 <div id="postsz" class="">
+<<<<<<< HEAD
 
 
                     <form id="post-form" method="post" action="/communities/{{.Community.ID}}/posts" class="folded for-identified-user" data-post-subtype="default" name="test-post-default-form">
@@ -39,6 +44,8 @@
                     </form>
 
 
+=======
+>>>>>>> eca8e33aed99c3b7edba2bcd2d3ea7703a88ae65
                     <div class="body-content" id="community-post-list">
                         <div class="list post-list js-post-list" data-next-page-url="">
                             {{if .Posts}}

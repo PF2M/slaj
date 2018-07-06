@@ -19,7 +19,11 @@ import (
 var db *sql.DB
 var err error
 
+<<<<<<< HEAD
 var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/create_post.html"))
+=======
+var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html"))
+>>>>>>> eca8e33aed99c3b7edba2bcd2d3ea7703a88ae65
 
 // Variable declarations for users.
 type user struct {
@@ -89,8 +93,12 @@ func routes() {
 	r.HandleFunc("/act/login", login)
 	r.HandleFunc("/act/logout", logout)
 	// Community routes.
+<<<<<<< HEAD
 	r.HandleFunc("/communities/{id:[0-9]+}", showCommunity)
 	r.HandleFunc("/communities/{id:[0-9]+}/posts", createPost).Methods("POST")
+=======
+	r.HandleFunc("/communities/{id}", showCommunity)
+>>>>>>> eca8e33aed99c3b7edba2bcd2d3ea7703a88ae65
 	// Serve static assets.
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	http.Handle("/", r)
@@ -290,11 +298,16 @@ func showCommunity(w http.ResponseWriter, r *http.Request) {
 		posts = append(posts, row)
 	}
 
+<<<<<<< HEAD
 	pjax := r.Header.Get("X-PJAX") == ""
 
 	var data = map[string]interface{}{
 		"Title":     communities.Title,
 		"Pjax":      pjax,
+=======
+	var data = map[string]interface{}{
+		"Title":     communities.Title,
+>>>>>>> eca8e33aed99c3b7edba2bcd2d3ea7703a88ae65
 		"User":      users,
 		"Community": communities,
 		"Posts":     posts,
@@ -307,6 +320,7 @@ func showCommunity(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+<<<<<<< HEAD
 func createPost(w http.ResponseWriter, r *http.Request) {
 	session := sessions.Start(w, r)
 
@@ -340,6 +354,8 @@ func createPost(w http.ResponseWriter, r *http.Request) {
 
 }
 
+=======
+>>>>>>> eca8e33aed99c3b7edba2bcd2d3ea7703a88ae65
 func register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.ServeFile(w, r, "views/auth/register.html")
