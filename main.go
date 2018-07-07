@@ -4,7 +4,10 @@ package main
 import (
 	// internals
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -13,16 +16,33 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var db *sql.DB
-var err error
+var (
+	config = configType{}
+	db     *sql.DB
+	err    error
+)
 
 var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/post.html", "views/create_post.html"))
 
 // Main function.
 func main() {
 
+	// read the config
+	configByte, err := ioutil.ReadFile("config.json")
+	if err != nil {
+
+		// we were unable to read the config file
+		log.Printf("[err]: unable to read configuration file...\n")
+		log.Printf("       %v\n", err)
+		os.Exit(1)
+
+	}
+
+	// parse it to a golang-usable type
+	err = json.Unmarshal(configByte, &config)
+
 	// Connect to the database.
-	db, err = sql.Open("mysql", "slaj:slaj@tcp(127.0.0.1:3306)/slaj")
+	db, err = sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s", config.Database.Username, config.Database.Password, config.Database.Address, config.Database.Database))
 	if err != nil {
 
 		// we were unable to connect to the database
@@ -71,9 +91,9 @@ func main() {
 	http.Handle("/", r)
 
 	// tell the person who started this that we have started the server
-	log.Printf("listening on :8080")
+	log.Printf("listening on :%d\n", config.Port)
 
 	// start the server
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(fmt.Sprintf(":%d", config.Port), nil)
 
 }

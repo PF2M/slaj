@@ -1,5 +1,5 @@
 # slaj
 
-## a miiverse clone by pf2m and some other people
+## a miiverse clone by anons
 
 ... you get the idea

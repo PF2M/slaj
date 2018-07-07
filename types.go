@@ -8,6 +8,20 @@ file that holds all types/structures declared in slaj
 
 package main
 
+// type for the database parts of the config
+type databaseConfig struct {
+	Address  string `json:"address"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Database string `json:"database"`
+}
+
+// type for the entire config
+type configType struct {
+	Port     int            `json:"port"`
+	Database databaseConfig `json:"database"`
+}
+
 // Variable declarations for users.
 type user struct {
 	ID                int
