@@ -48,7 +48,11 @@
                                         <p class="user-name"><a href="/users/{{$post.PosterUsername}}">{{$post.PosterNickname}}</a></p>
                                         <p class="timestamp-container">
                                             <span class="spoiler-status">Spoilers·</span>
+<<<<<<< HEAD
                                         <a class="timestamp" href="/posts/{{$post.ID}}">{{$post.CreatedAt}}</a>
+=======
+                                        <a class="timestamp" href="/posts/{{$post.ID}}">{{$post.CreatedAt}} (haven't added human timestamps yet)</a>
+>>>>>>> 6fcb87b263e0038b73555b1ba7d6b719e31e4d04
                                         </p>
                                         <div class="body post-content">
                                             <p class="post-content-text">{{$post.Body}}</p>
@@ -72,6 +76,10 @@
         </div>
     </div>
 </div>
+<<<<<<< HEAD
 {{if .Pjax}}
     {{template "footer.html"}}
 {{end}}
+=======
+{{template "footer.html"}}
+>>>>>>> 6fcb87b263e0038b73555b1ba7d6b719e31e4d04
