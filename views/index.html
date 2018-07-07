@@ -1,4 +1,6 @@
-{{template "header.html" .}}
+{{if .Pjax}}
+	{{template "header.html" .}}
+{{end}}
 <div id="container">
 	<div id="main-body" class="guest-top " csrf-token="">
 		<h1 style="font-size: 110px">ok you are signed in as {{ .User.Username }}</h1>
@@ -62,4 +64,6 @@
 		</div>
 	</div>
 </div>
-{{template "footer.html"}}
+{{if .Pjax}}
+	{{template "footer.html"}}
+{{end}}

@@ -1,0 +1,43 @@
+{{if .Pjax}}
+	{{template "header.html" .}}
+{{end}}
+<div id="container">
+
+<div id="main-body" class="">
+<div class="main-column replyform-bottom"><div class="post-list-outline">
+<section id="post-content" class="post post-subtype-default">
+<header class="community-container">
+<h1 class="community-container-heading">
+<a href="/communities/{{.Community.ID}}"><img src="{{.Community.Icon}}" class="community-icon">{{.Community.Title}}</a>
+</h1>
+</header>
+<div class="user-content">
+<a href="/users/{{.Post.PosterUsername}}" class="icon-container"><img src="{{.Post.PosterIcon}}" class="icon"></a>
+<div class="user-name-content">
+<p class="user-name"><a href="/users/{{.Post.PosterUsername}}">{{.Post.PosterNickname}}</a><span class="user-id">{{.Post.PosterUsername}}</span></p>
+<p class="timestamp-container">
+<span class="timestamp">{{.Post.CreatedAt}}</span>
+<span class="spoiler-status">·Spoilers</span>
+</p>
+</div>
+</div>
+<div class="body">
+<div id="the-post">
+<p class="post-content-text">{{.Post.Body}}</p>
+<div class="post-meta">
+<button type="button" class="symbol submit yeah-button" data-feeling="" data-action="/posts/{{.Post.ID}}/yeah" data-url-id="{{.Post.ID}}"><span class="yeah-button-text">Yeah!</span></button>
+<div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">0</span></div>
+<div class="reply symbol"><span class="symbol-label">Comments</span><span class="reply-count">0</span></div>
+</div>
+</div>
+</div></section>
+
+
+
+</div>
+</div>
+</div>
+</div>
+{{if .Pjax}}
+    {{template "footer.html"}}
+{{end}}

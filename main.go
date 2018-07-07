@@ -2,259 +2,78 @@ package main
 
 // Import dependencies.
 import (
+	// internals
 	"database/sql"
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"time"
-
+	"os"
+	// externals
 	_ "github.com/go-sql-driver/mysql"
-	sessions "github.com/kataras/go-sessions"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/gorilla/mux"
 )
 
 var db *sql.DB
 var err error
 
-var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html"))
-
-// Variable declarations for users.
-type user struct {
-	ID                int
-	Username          string
-	Nickname          string
-	Avatar            string
-	Email             string
-	Password          string
-	IP                string
-	Level             int
-	Role              int
-	LastSeen          string
-	Color             string
-	YeahNotifications bool
-}
-
-//Variable declarations for communities.
-type community struct {
-	ID          int
-	Title       string
-	Description string
-	Icon        string
-	Banner      string
-}
-
-// Initialize database.
-func connect() {
-	db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1)/slaj")
-	if err != nil {
-		log.Fatalln(err)
-	}
-	err = db.Ping()
-	if err != nil {
-		log.Fatalln(err)
-	}
-}
-
-// Define routes.
-func routes() {
-	// Index route.
-	http.HandleFunc("/", index)
-	// Auth routes.
-	http.HandleFunc("/act/register", register)
-	http.HandleFunc("/act/login", login)
-	http.HandleFunc("/act/logout", logout)
-	// Serve static assets.
-	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
-}
+var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/post.html", "views/create_post.html"))
 
 // Main function.
 func main() {
-	// Connect to database.
-	connect()
-	// Initialize routes.
-	routes()
 
+	// Connect to the database.
+	db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/slaj?parseTime=true")
+	if err != nil {
+
+		// we were unable to connect to the database
+		log.Printf("[err]: unable to connect to the database...\n")
+		log.Printf("       %v\n", err)
+		os.Exit(1)
+
+	}
+
+	// ping the database once to ensure that it is available
+	err = db.Ping()
+	if err != nil {
+
+		// we were unable to ping it
+		log.Printf("[err]: unable to ping the database...\n")
+		log.Printf("       %v\n", err)
+		os.Exit(1)
+
+	}
+
+	// close the database connection after this function exits
 	defer db.Close()
 
+	// Initialize routes.
+	r := mux.NewRouter()
+
+	// Index route.
+	r.HandleFunc("/", index)
+
+	// Auth routes.
+	r.HandleFunc("/act/register", register)
+	r.HandleFunc("/act/login", login)
+	r.HandleFunc("/act/logout", logout)
+
+	// Post routes.
+	r.HandleFunc("/posts/{id:[0-9]+}", showPost)
+
+	// Community routes.
+	r.HandleFunc("/communities/{id:[0-9]+}", showCommunity)
+	r.HandleFunc("/communities/{id:[0-9]+}/posts", createPost).Methods("POST")
+
+	// Serve static assets.
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+
+	// tell the http server to handle routing with the router we just made
+	http.Handle("/", r)
+
+	// tell the person who started this that we have started the server
+	log.Printf("listening on :8080")
+
+	// start the server
 	http.ListenAndServe(":8080", nil)
-}
 
-// Checks for errors, returns boolean.
-func checkErr(w http.ResponseWriter, r *http.Request, err error) bool {
-	if err != nil {
-
-		fmt.Println(r.Host + r.URL.Path)
-
-		http.Redirect(w, r, r.Host+r.URL.Path, 301)
-		return false
-	}
-
-	return true
-}
-
-// Find a user by username.
-func QueryUser(username string) user {
-	var users = user{}
-	err = db.QueryRow(`
-		SELECT id,
-		username,
-		nickname,
-		avatar,
-		email,
-		password,
-		ip,
-		level,
-		role,
-		last_seen,
-		color,
-		yeah_notifications
-		FROM users WHERE username=?
-		`, username).
-		Scan(
-			&users.ID,
-			&users.Username,
-			&users.Nickname,
-			&users.Avatar,
-			&users.Email,
-			&users.Password,
-			&users.IP,
-			&users.Level,
-			&users.Role,
-			&users.LastSeen,
-			&users.Color,
-			&users.YeahNotifications,
-		)
-	return users
-}
-
-func index(w http.ResponseWriter, r *http.Request) {
-	session := sessions.Start(w, r)
-	if len(session.GetString("username")) == 0 {
-		http.Redirect(w, r, "/act/login", 301)
-	}
-
-	users := QueryUser(session.GetString("username"))
-
-	featured_rows, _ := db.Query("SELECT id, title, icon, banner FROM communities WHERE is_featured = 1 LIMIT 4")
-	var featured []community
-
-	for featured_rows.Next() {
-		var row = community{}
-
-		err = featured_rows.Scan(&row.ID, &row.Title, &row.Icon, &row.Banner)
-		if err != nil {
-			fmt.Println(err)
-		}
-		featured = append(featured, row)
-	}
-
-	community_rows, _ := db.Query("SELECT id, title, icon, banner FROM communities ORDER BY id DESC LIMIT 6")
-	var communities []community
-
-	for community_rows.Next() {
-		var row = community{}
-
-		err = community_rows.Scan(&row.ID, &row.Title, &row.Icon, &row.Banner)
-		if err != nil {
-			fmt.Println(err)
-		}
-		communities = append(communities, row)
-	}
-
-	var data = map[string]interface{}{
-		"Title":       "Communities",
-		"User":        users,
-		"Featured":    featured,
-		"Communities": communities,
-	}
-
-	err := templates.ExecuteTemplate(w, "index.html", data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	return
-}
-
-func register(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.ServeFile(w, r, "views/auth/register.html")
-		return
-	}
-	// Define user registration info.
-	username := r.FormValue("username")
-	nickname := r.FormValue("nickname")
-	avatar := r.FormValue("avatar")
-	email := r.FormValue("email")
-	password := r.FormValue("password")
-	ip := r.Header.Get("X-Forwarded-For")
-	level := "0"
-	role := "0"
-	last_seen := time.Now()
-	color := ""
-	yeah_notifications := "1"
-
-	users := QueryUser(username)
-
-	if (user{}) == users {
-		// Let's hash the password. We're using bcrypt for this.
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-
-		if len(hashedPassword) != 0 && checkErr(w, r, err) {
-			// Prepare the statement.
-			stmt, err := db.Prepare("INSERT users SET username=?, nickname=?, avatar=?, email=?, password=?, ip=?, level=?, role=?, last_seen=?, color=?, yeah_notifications=?")
-			if err == nil {
-				// If there's no errors, we can go ahead and execute the statement.
-				_, err := stmt.Exec(&username, &nickname, &avatar, &email, &hashedPassword, &ip, &level, &role, &last_seen, &color, &yeah_notifications)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
-				users := QueryUser(username)
-
-				session := sessions.Start(w, r)
-				session.Set("username", users.Username)
-				http.Redirect(w, r, "/", 302)
-			}
-		} else {
-			http.Redirect(w, r, "/act/register", 302)
-		}
-	}
-}
-
-func login(w http.ResponseWriter, r *http.Request) {
-	// Start the session.
-	session := sessions.Start(w, r)
-	if len(session.GetString("username")) != 0 && checkErr(w, r, err) {
-		// Redirect to index page if the user isn't signed in. Will remove later.
-		http.Redirect(w, r, "/", 302)
-	}
-
-	if r.Method != "POST" {
-		http.ServeFile(w, r, "views/auth/login.html")
-		return
-	}
-
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-
-	users := QueryUser(username)
-
-	// Compare inputted password to the password in the database. If they're the same, return nil.
-	var password_compare = bcrypt.CompareHashAndPassword([]byte(users.Password), []byte(password))
-
-	if password_compare == nil {
-		session := sessions.Start(w, r)
-		session.Set("username", users.Username)
-		http.Redirect(w, r, "/", 302)
-	} else {
-		http.Redirect(w, r, "/act/login", 302)
-	}
-}
-
-func logout(w http.ResponseWriter, r *http.Request) {
-	session := sessions.Start(w, r)
-	session.Clear()
-	sessions.Destroy(w, r)
-	http.Redirect(w, r, "/", 302)
 }
