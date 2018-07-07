@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-<<<<<<< HEAD
 	"time"
 )
 
@@ -32,10 +31,6 @@ func humanTiming(timestamp time.Time) string {
 
 }
 
-=======
-)
-
->>>>>>> 6fcb87b263e0038b73555b1ba7d6b719e31e4d04
 // function that checks for an error and logs it. it returns either a true or false value
 func checkErr(w http.ResponseWriter, r *http.Request, err error) bool {
 
@@ -92,40 +87,6 @@ func QueryUser(username string) user {
 	return users
 }
 
-<<<<<<< HEAD
-=======
-// Find a post by ID.
-func QueryPost(id string) post {
-	var posts = post{}
-	err = db.QueryRow(`
-		SELECT id,
-		created_by,
-		community_id,
-		created_at,
-		body,
-		image,
-		url,
-		is_spoiler,
-		is_rm,
-		is_rm_by_admin
-		FROM posts WHERE id = ?
-		`, id).
-		Scan(
-			&posts.ID,
-			&posts.CreatedBy,
-			&posts.CommunityID,
-			&posts.CreatedAt,
-			&posts.Body,
-			&posts.Image,
-			&posts.URL,
-			&posts.IsSpoiler,
-			&posts.IsRm,
-			&posts.IsRmByAdmin,
-		)
-	return posts
-}
-
->>>>>>> 6fcb87b263e0038b73555b1ba7d6b719e31e4d04
 // Find a community by ID.
 func QueryCommunity(id string) community {
 	var communities = community{}
