@@ -110,15 +110,10 @@ func showCommunity(w http.ResponseWriter, r *http.Request) {
 	for post_rows.Next() {
 
 		var row = post{}
-<<<<<<< HEAD
 		var timestamp time.Time
 
 		err = post_rows.Scan(&row.ID, &row.CreatedBy, &timestamp, &row.Body, &row.PosterUsername, &row.PosterNickname, &row.PosterIcon)
 		row.CreatedAt = humanTiming(timestamp)
-=======
-
-		err = post_rows.Scan(&row.ID, &row.CreatedBy, &row.CreatedAt, &row.Body, &row.PosterUsername, &row.PosterNickname, &row.PosterIcon)
->>>>>>> 6fcb87b263e0038b73555b1ba7d6b719e31e4d04
 		if err != nil {
 
 			fmt.Println(err)
@@ -161,7 +156,6 @@ func showPost(w http.ResponseWriter, r *http.Request) {
 	users := QueryUser(session.GetString("username"))
 
 	id := strings.Split(r.URL.RequestURI(), "/posts/")
-<<<<<<< HEAD
 
 	var posts = post{}
 	var timestamp time.Time
@@ -169,9 +163,6 @@ func showPost(w http.ResponseWriter, r *http.Request) {
 	db.QueryRow("SELECT posts.id, created_by, community_id, created_at, body, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE posts.id = ?", id[1]).
 		Scan(&posts.ID, &posts.CreatedBy, &timestamp, &posts.Body, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
 	posts.CreatedAt = humanTiming(timestamp)
-=======
-	posts := QueryPost(id[1])
->>>>>>> 6fcb87b263e0038b73555b1ba7d6b719e31e4d04
 
 	community := QueryCommunity(strconv.Itoa(posts.CommunityID))
 	pjax := r.Header.Get("X-PJAX") == ""
@@ -217,21 +208,12 @@ func createPost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var posts = post{}
-<<<<<<< HEAD
 		var timestamp time.Time
 
 		db.QueryRow("SELECT posts.id, created_by, created_at, body, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE created_by = ? ORDER BY created_at DESC LIMIT 1", user_id).
 			Scan(&posts.ID, &posts.CreatedBy, &timestamp, &posts.Body, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
 		posts.CreatedAt = humanTiming(timestamp)
 		var data = map[string]interface{}{
-=======
-
-		db.QueryRow("SELECT posts.id, created_by, created_at, body, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE created_by = ? ORDER BY created_at DESC LIMIT 1", user_id).
-			Scan(&posts.ID, &posts.CreatedBy, &posts.CreatedAt, &posts.Body, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
-
-		var data = map[string]interface{}{
-
->>>>>>> 6fcb87b263e0038b73555b1ba7d6b719e31e4d04
 			"Post": posts,
 		}
 
