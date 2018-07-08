@@ -1,5 +1,5 @@
 # slaj
 
-## a miiverse clone by eric, seth, and pf2m
+## a miiverse clone by pf2m and some other people
 
 ... you get the idea

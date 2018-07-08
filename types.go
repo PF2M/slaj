@@ -8,20 +8,6 @@ file that holds all types/structures declared in slaj
 
 package main
 
-// type for the database parts of the config
-type databaseConfig struct {
-	Address  string `json:"address"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Database string `json:"database"`
-}
-
-// type for the entire config
-type configType struct {
-	Port     int            `json:"port"`
-	Database databaseConfig `json:"database"`
-}
-
 // Variable declarations for users.
 type user struct {
 	ID                int
@@ -53,6 +39,22 @@ type post struct {
 	PosterUsername string
 	PosterNickname string
 	PosterIcon     string
+}
+
+// Variable declarations for comments.
+type comment struct {
+	ID int
+	CreatedBy int
+	CommunityID int
+	CreatedAt string
+	Body string
+	Image string
+	IsSpoiler bool
+	IsRm bool
+	IsRmByAdmin bool
+	PosterUsername string
+	PosterNickname string
+	PosterIcon string
 }
 
 // Variable declarations for communities.

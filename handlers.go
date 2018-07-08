@@ -161,7 +161,7 @@ func showPost(w http.ResponseWriter, r *http.Request) {
 	var timestamp time.Time
 
 	db.QueryRow("SELECT posts.id, created_by, community_id, created_at, body, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE posts.id = ?", id[1]).
-		Scan(&posts.ID, &posts.CreatedBy, &timestamp, &posts.Body, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
+		Scan(&posts.ID, &posts.CreatedBy, &posts.CommunityID, &timestamp, &posts.Body, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
 	posts.CreatedAt = humanTiming(timestamp)
 
 	community := QueryCommunity(strconv.Itoa(posts.CommunityID))
@@ -213,6 +213,7 @@ func createPost(w http.ResponseWriter, r *http.Request) {
 		db.QueryRow("SELECT posts.id, created_by, created_at, body, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE created_by = ? ORDER BY created_at DESC LIMIT 1", user_id).
 			Scan(&posts.ID, &posts.CreatedBy, &timestamp, &posts.Body, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
 		posts.CreatedAt = humanTiming(timestamp)
+
 		var data = map[string]interface{}{
 			"Post": posts,
 		}
