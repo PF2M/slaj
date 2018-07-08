@@ -26,10 +26,7 @@ CREATE TABLE IF NOT EXISTS `comments` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table slaj.comments: ~0 rows (approximately)
-/*!40000 ALTER TABLE `comments` DISABLE KEYS */;
-/*!40000 ALTER TABLE `comments` ENABLE KEYS */;
-
+-- Data exporting was unselected.
 -- Dumping structure for table slaj.communities
 CREATE TABLE IF NOT EXISTS `communities` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -44,12 +41,7 @@ CREATE TABLE IF NOT EXISTS `communities` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table slaj.communities: ~0 rows (approximately)
-/*!40000 ALTER TABLE `communities` DISABLE KEYS */;
-INSERT INTO `communities` (`id`, `title`, `description`, `icon`, `banner`, `is_featured`, `developer_only`, `staff_only`, `rm`) VALUES
-	(1, 'General Discussion Community', 'who cares lmao', 'https://kek.gg/i/5k4jmK.png', 'https://kek.gg/i/3qs7b9.png', 1, 0, 0, 0);
-/*!40000 ALTER TABLE `communities` ENABLE KEYS */;
-
+-- Data exporting was unselected.
 -- Dumping structure for table slaj.posts
 CREATE TABLE IF NOT EXISTS `posts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -65,12 +57,7 @@ CREATE TABLE IF NOT EXISTS `posts` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table slaj.posts: ~19 rows (approximately)
-/*!40000 ALTER TABLE `posts` DISABLE KEYS */;
-INSERT INTO `posts` (`id`, `created_by`, `community_id`, `created_at`, `body`, `image`, `url`, `is_spoiler`, `is_rm`, `is_rm_by_admin`) VALUES
-	(1, 1, 1, '2018-07-07 21:17:39', 'this is a post ', NULL, NULL, 0, 0, 0);
-/*!40000 ALTER TABLE `posts` ENABLE KEYS */;
-
+-- Data exporting was unselected.
 -- Dumping structure for table slaj.profiles
 CREATE TABLE IF NOT EXISTS `profiles` (
   `user` int(11) NOT NULL AUTO_INCREMENT,
@@ -85,10 +72,7 @@ CREATE TABLE IF NOT EXISTS `profiles` (
   PRIMARY KEY (`user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
--- Dumping data for table slaj.profiles: ~0 rows (approximately)
-/*!40000 ALTER TABLE `profiles` DISABLE KEYS */;
-/*!40000 ALTER TABLE `profiles` ENABLE KEYS */;
-
+-- Data exporting was unselected.
 -- Dumping structure for table slaj.users
 CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -106,12 +90,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
--- Dumping data for table slaj.users: 2 rows
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` (`id`, `username`, `nickname`, `avatar`, `email`, `password`, `ip`, `level`, `role`, `last_seen`, `color`, `yeah_notifications`) VALUES
-	(1, 'cedar', 'ok', 'https://cdn.discordapp.com/attachments/462129189152096277/464848128886046740/JPEG_20180706_193945.jpg', 'cedar', '$2a$10$6SSZNsK6aCAspCx.0tfgXO9uYn3YbD2GSaYId4ilwLDmHq1a70tYu', '', 0, 0, '2018-07-08 00:49:30', '', 1);
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-
+-- Data exporting was unselected.
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
