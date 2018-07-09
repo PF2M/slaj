@@ -177,13 +177,9 @@ func showPost(w http.ResponseWriter, r *http.Request) {
 
 	err := templates.ExecuteTemplate(w, "post.html", data)
 	if err != nil {
-
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-
 	}
-
 	return
-
 }
 
 // the handler for post creation
@@ -230,6 +226,31 @@ func createPost(w http.ResponseWriter, r *http.Request) {
 
 	}
 
+}
+
+// the handler for a specific user profile
+func showUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("cache-control", "no-store, no-cache, must-revalidate")
+	session := sessions.Start(w, r)
+
+	if len(session.GetString("username")) == 0 {
+		http.Redirect(w, r, "/act/login", 301)
+	}
+
+	username := strings.Split(r.URL.RequestURI(), "/users/")
+	pjax := r.Header.Get("X-PJAX") == ""
+	user := QueryUser(username[1])
+
+	var data = map[string]interface{}{
+		"Title":     user.Username,
+		"Pjax":      pjax,
+		"User":      user,
+	}
+	err := templates.ExecuteTemplate(w, "user.html", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	return
 }
 
 // the handler for user registration

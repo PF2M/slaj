@@ -1,0 +1,40 @@
+{{if .Pjax}} 
+    {{template "header.html" .}}
+{{end}}
+<div id="container">
+    <div id="main-body" class="profile-top" csrf-token="">
+        <div id="sidebar" class="user-sidebar">
+            <div class="sidebar-container">
+                <div id="sidebar-profile-body">
+                    <div class="icon-container">
+                        <a href="/users/{{.User.Username}}"><img src="{{.User.Avatar}}" alt="{{.User.Username}}" class="icon"></a>
+                    </div>
+                    <a href="/users/{{.User.Username}}" class="nick-name" style="color:{{.User.Color}}">{{.User.Nickname}}</a>
+                    <p class="id-name">{{.User.Username}}</p>
+                </div>
+                <div class="user-action-content">
+                    <div class="toggle-button">
+                        <button type="button" data-action="/users/{{.User.Username}}/follow" class="follow-button button symbol">Follow</button>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-setting sidebar-container">
+                <div class="sidebar-post-menu">
+                    <a href="/users/{{.User.Username}}/posts" class="sidebar-menu-post with-count symbol"><span>All posts</span><span class="post-count"><span class="test-post-count">placeholder</span></a>
+                    <a href="/users/{{.User.Username}}/comments" class="sidebar-menu-replies with-count symbol"><span>All comments</span><span class="post-count"><span class="test-reply-count">placeholder</span></a>
+                    <a href="/users/{{.User.Username}}/yeahs" class="sidebar-menu-empathies with-count symbol"><span>Yeahs given</span><span class="post-count"><span class="test-empathy-count">placeholder</span></a>
+                </div>
+            </div>
+            <div class="sidebar-container sidebar-profile">
+                <div class="profile-comment">
+                    <p class="js-truncated-text">
+                        todo: add profile assets
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{if .Pjax}}
+    {{template "footer.html"}}
+{{end}}

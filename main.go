@@ -16,7 +16,7 @@ import (
 var db *sql.DB
 var err error
 
-var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/post.html", "views/create_post.html"))
+var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/post.html", "views/create_post.html", "views/user.html"))
 
 // Main function.
 func main() {
@@ -60,6 +60,9 @@ func main() {
 	// Post routes.
 	r.HandleFunc("/posts/{id:[0-9]+}", showPost)
 
+	// User routes.
+	r.HandleFunc("/users/{username}", showUser)
+	
 	// Community routes.
 	r.HandleFunc("/communities/{id:[0-9]+}", showCommunity)
 	r.HandleFunc("/communities/{id:[0-9]+}/posts", createPost).Methods("POST")
