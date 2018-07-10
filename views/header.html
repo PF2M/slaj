@@ -21,6 +21,7 @@
 	<link rel="stylesheet" type="text/css" href="/assets/css/offdevice.css">
 	<script src="/assets/js/jslibs.js"></script>
 	<script src="/assets/js/slaj.js"></script>
+	<script src="/assets/js/websocket.js"></script>
 </head>
 
 <body class="">
@@ -33,7 +34,7 @@
 			<li id="global-menu-logo"><h1><a href="/"><img src="/assets/img/nova-logo.png" alt="Nova"></a></h1></li>
 			{{if .IsGuest}}
 				<li id="global-menu-login">
-					<a href="/login/" class="login">
+					<a href="/act/login" class="login">
 						<input type="image" alt="Sign in" src="/s/img/sign-in.png">
 					</a>
 				</li>
@@ -63,7 +64,7 @@
 								<li><a href="/server" class="symbol my-menu-openman"><span>Server Statistics</span></a></li>
 								<li><a href="/my_blacklist" class="symbol my-menu-opee"><span>My block list</span></a></li>
 								<li>
-									<form action="/act/logout" method="post" id="my-menu-logout" class="symbol">
+									<form action="/act/logout/" method="post" id="my-menu-logout" class="symbol">
 										<input type="hidden" name="csrfmiddlewaretoken" value="">
 										<input type="submit" value="Log out">
 									</form>

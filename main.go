@@ -11,18 +11,28 @@ import (
 	// externals
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 )
 
 var db *sql.DB
 var err error
 
-var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/post.html", "views/create_post.html", "views/user.html"))
+var clients = make(map[*websocket.Conn]wsSession)
+
+// Configure the upgrader
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/post.html", "views/create_post.html"))
 
 // Main function.
 func main() {
 
 	// Connect to the database.
-	db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/slaj?parseTime=true")
+	db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/slaj?parseTime=true&charset=utf8mb4,utf8")
 	if err != nil {
 
 		// we were unable to connect to the database
@@ -60,12 +70,15 @@ func main() {
 	// Post routes.
 	r.HandleFunc("/posts/{id:[0-9]+}", showPost)
 
-	// User routes.
-	r.HandleFunc("/users/{username}", showUser)
-	
 	// Community routes.
 	r.HandleFunc("/communities/{id:[0-9]+}", showCommunity)
 	r.HandleFunc("/communities/{id:[0-9]+}/posts", createPost).Methods("POST")
+
+	// Upload image.
+	r.HandleFunc("/upload", uploadImage).Methods("POST")
+
+	// Test websocket route.
+	r.HandleFunc("/ws", handleConnections)
 
 	// Serve static assets.
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))

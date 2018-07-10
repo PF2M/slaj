@@ -5186,7 +5186,7 @@ div#activity-feed-tutorial.no-content p.tleft {
 }
 .screenshot-container img {
   vertical-align: bottom;
-  width: 100%;
+  max-width: 100%;
 }
 .screenshot-container.video {
   position: relative;
@@ -5534,8 +5534,9 @@ div#activity-feed-tutorial.no-content p.tleft {
 }
 .post-list .screenshot-container img {
   width: auto;
-  height: 240px;
+  height: auto;
   max-width: 100%;
+  max-height: 320px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   -ms-border-radius: 5px;
@@ -8842,7 +8843,15 @@ body.search .search-content p.note {
     margin-right: 0;
   }
   .post-list .screenshot-container img {
+    width: auto;
     height: auto;
+    max-width: 100%;
+    max-height: 320px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
   }
   .post-list .post-content-memo {
     margin-right: 0;

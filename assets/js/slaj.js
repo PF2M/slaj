@@ -1757,7 +1757,7 @@ var Olv = Olv || {};
         }
         function f(c) {
             var d = h.filter("[data-required]:visible")
-              , f = d.length > 0 && e(d)
+              , f = (d.length > 0 || $("input[name=image]").length > 0) && e(d)
               , g = i.filter(function() {
                 return !a(this).val()
             }).length > 0;
@@ -3467,6 +3467,7 @@ b.router.connect("^/my_blacklist$", function() {
             "screenshot" === d.attr("name") ? e.attr("data-post-with-screenshot", "screenshot") : "painting" === d.attr("name") && e.attr("data-post-content-type", "draw")
         }),
         a(document).on("olv:entryform:reset", function(b) {
+            a(".preview-container").css("display", "none");
             var d = a(b.target)
               , e = d.find("input[type=submit]");
             e.attr("data-post-content-type", "text"),

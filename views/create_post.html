@@ -7,6 +7,11 @@
     </p>
     <div class="body post-content">
         <p class="post-content-text">{{.Post.Body}}</p>
+        {{if .Post.Image}}
+            <div class="screenshot-container still-image">
+                <img src="{{.Post.Image}}">
+            </div>
+        {{end}}
         <div class="post-meta">
             <button type="button" class="symbol submit yeah-button" data-feeling="" data-action="/posts/{{.Post.ID}}/yeah" data-url-id="{{.Post.ID}}"><span class="yeah-button-text">Yeah!</span></button>
             <div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">0</span></div>

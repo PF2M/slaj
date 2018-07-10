@@ -10,7 +10,9 @@ package main
 
 import (
 	// internals
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -104,7 +106,7 @@ func showCommunity(w http.ResponseWriter, r *http.Request) {
 	id := strings.Split(r.URL.RequestURI(), "/communities/")
 	communities := QueryCommunity(id[1])
 
-	post_rows, _ := db.Query("SELECT posts.id, created_by, created_at, body, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE community_id = ? ORDER BY created_at DESC LIMIT 50", id[1])
+	post_rows, _ := db.Query("SELECT posts.id, created_by, created_at, body, image, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE community_id = ? ORDER BY created_at DESC LIMIT 50", id[1])
 	var posts []post
 
 	for post_rows.Next() {
@@ -112,7 +114,7 @@ func showCommunity(w http.ResponseWriter, r *http.Request) {
 		var row = post{}
 		var timestamp time.Time
 
-		err = post_rows.Scan(&row.ID, &row.CreatedBy, &timestamp, &row.Body, &row.PosterUsername, &row.PosterNickname, &row.PosterIcon)
+		err = post_rows.Scan(&row.ID, &row.CreatedBy, &timestamp, &row.Body, &row.Image, &row.PosterUsername, &row.PosterNickname, &row.PosterIcon)
 		row.CreatedAt = humanTiming(timestamp)
 		if err != nil {
 
@@ -160,8 +162,8 @@ func showPost(w http.ResponseWriter, r *http.Request) {
 	var posts = post{}
 	var timestamp time.Time
 
-	db.QueryRow("SELECT posts.id, created_by, community_id, created_at, body, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE posts.id = ?", id[1]).
-		Scan(&posts.ID, &posts.CreatedBy, &posts.CommunityID, &timestamp, &posts.Body, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
+	db.QueryRow("SELECT posts.id, created_by, community_id, created_at, body, image, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE posts.id = ?", id[1]).
+		Scan(&posts.ID, &posts.CreatedBy, &posts.CommunityID, &timestamp, &posts.Body, &posts.Image, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
 	posts.CreatedAt = humanTiming(timestamp)
 
 	community := QueryCommunity(strconv.Itoa(posts.CommunityID))
@@ -177,9 +179,13 @@ func showPost(w http.ResponseWriter, r *http.Request) {
 
 	err := templates.ExecuteTemplate(w, "post.html", data)
 	if err != nil {
+
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+
 	}
+
 	return
+
 }
 
 // the handler for post creation
@@ -190,12 +196,23 @@ func createPost(w http.ResponseWriter, r *http.Request) {
 	user_id := session.GetString("user_id")
 	community_id := r.FormValue("community")
 	body := r.FormValue("body")
+	image := r.FormValue("image")
+	url := r.FormValue("url")
 
-	stmt, err := db.Prepare("INSERT posts SET created_by=?, community_id=?, body=?")
+	if len(body) > 2000 {
+		http.Error(w, "Your post is too long. (2000 characters maximum)", http.StatusBadRequest)
+		return
+	}
+	if len(body) == 0 && len(image) == 0 {
+		http.Error(w, "Your post is empty.", http.StatusBadRequest)
+		return
+	}
+
+	stmt, err := db.Prepare("INSERT posts SET created_by=?, community_id=?, body=?, image=?, url=?")
 	if err == nil {
 
 		// If there's no errors, we can go ahead and execute the statement.
-		_, err := stmt.Exec(&user_id, &community_id, &body)
+		_, err := stmt.Exec(&user_id, &community_id, &body, &image, &url)
 		if err != nil {
 
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -206,11 +223,12 @@ func createPost(w http.ResponseWriter, r *http.Request) {
 		var posts = post{}
 		var timestamp time.Time
 
-		db.QueryRow("SELECT posts.id, created_by, created_at, body, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE created_by = ? ORDER BY created_at DESC LIMIT 1", user_id).
-			Scan(&posts.ID, &posts.CreatedBy, &timestamp, &posts.Body, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
+		db.QueryRow("SELECT posts.id, created_by, created_at, body, image, username, nickname, avatar FROM posts LEFT JOIN users ON users.id = created_by WHERE created_by = ? ORDER BY created_at DESC LIMIT 1", user_id).
+			Scan(&posts.ID, &posts.CreatedBy, &timestamp, &posts.Body, &posts.Image, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
 		posts.CreatedAt = humanTiming(timestamp)
 
 		var data = map[string]interface{}{
+
 			"Post": posts,
 		}
 
@@ -222,34 +240,54 @@ func createPost(w http.ResponseWriter, r *http.Request) {
 
 		}
 
+		var postTpl bytes.Buffer
+
+		templates.ExecuteTemplate(&postTpl, "create_post.html", data)
+
+		var msg wsMessage
+
+		msg.Type = "post"
+		msg.Content = postTpl.String()
+
+		for client := range clients {
+			if clients[client].OnPage == "/communities/"+community_id && clients[client].UserID != strconv.Itoa(posts.CreatedBy) {
+				err := client.WriteJSON(msg)
+				if err != nil {
+					fmt.Println(err)
+					client.Close()
+					delete(clients, client)
+				}
+			}
+		}
+
 		return
 
 	}
 
 }
 
-// the handler for a specific user profile
-func showUser(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("cache-control", "no-store, no-cache, must-revalidate")
-	session := sessions.Start(w, r)
+// Upload an image.
+func uploadImage(w http.ResponseWriter, r *http.Request) {
+	pretendconfigtype := "kek.gg" // temporary config variables to mimic a configuration file
 
-	if len(session.GetString("username")) == 0 {
-		http.Redirect(w, r, "/act/login", 301)
+	switch pretendconfigtype {
+	case "kek.gg":
+		resp, err := http.Post("https://u.kek.gg/v1/upload-to-kek", "text/plain", r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		bodyFixed := strings.Replace(string(body), "?", "", -1) // kek.gg adds a ? to the response, so let's remove that
+		bodyParsed := strings.Replace(bodyFixed, "\"", "", -1)  // remove the quotes too while we're here
+		w.Write([]byte(bodyParsed))
 	}
 
-	username := strings.Split(r.URL.RequestURI(), "/users/")
-	pjax := r.Header.Get("X-PJAX") == ""
-	user := QueryUser(username[1])
-
-	var data = map[string]interface{}{
-		"Title":     user.Username,
-		"Pjax":      pjax,
-		"User":      user,
-	}
-	err := templates.ExecuteTemplate(w, "user.html", data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 	return
 }
 
@@ -279,6 +317,10 @@ func register(w http.ResponseWriter, r *http.Request) {
 	users := QueryUser(username)
 
 	if (user{}) == users {
+		if len(username) > 32 || len(username) < 4 {
+			http.Error(w, "invalid username length sorry br0o0o0o0o0o0", http.StatusBadRequest)
+			return
+		}
 
 		// Let's hash the password. We're using bcrypt for this.
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -302,6 +344,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 
 				session := sessions.Start(w, r)
 				session.Set("username", users.Username)
+				session.Set("user_id", users.ID)
 				http.Redirect(w, r, "/", 302)
 
 			}
@@ -362,4 +405,41 @@ func logout(w http.ResponseWriter, r *http.Request) {
 	sessions.Destroy(w, r)
 	http.Redirect(w, r, "/", 302)
 
+}
+
+func handleConnections(w http.ResponseWriter, r *http.Request) {
+	session := sessions.Start(w, r)
+
+	// Upgrade initial GET request to a websocket
+	ws, _ := upgrader.Upgrade(w, r, nil)
+
+	// Make sure we close the connection when the function returns
+	defer ws.Close()
+
+	// Register our new client
+	// I need to use a 2nd variable to change .Connected because of a retarded issue in golang.
+	client := clients[ws]
+	client.Connected = true
+	client.UserID = session.GetString("user_id")
+	clients[ws] = client
+
+	fmt.Println("new connection")
+
+	for {
+		var msg wsMessage
+		// Read in a new message as JSON and map it to a Message object
+		err := ws.ReadJSON(&msg)
+		if err != nil {
+			fmt.Println(err)
+			delete(clients, ws)
+			break
+		}
+
+		if msg.Type == "onPage" {
+			client.OnPage = msg.Content
+			clients[ws] = client
+
+			fmt.Println(clients[ws].OnPage)
+		}
+	}
 }
