@@ -26,7 +26,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/post.html", "views/create_post.html"))
+var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/post.html", "views/create_post.html", "views/create_comment.html", "views/comment_preview.html", "views/user.html"))
 
 // Main function.
 func main() {
@@ -67,8 +67,12 @@ func main() {
 	r.HandleFunc("/act/login", login)
 	r.HandleFunc("/act/logout", logout)
 
+	// User routes.
+	r.HandleFunc("/users/{username}", showUser)
+	
 	// Post routes.
 	r.HandleFunc("/posts/{id:[0-9]+}", showPost)
+	r.HandleFunc("/posts/{id:[0-9]+}/comments", createComment)
 
 	// Community routes.
 	r.HandleFunc("/communities/{id:[0-9]+}", showCommunity)

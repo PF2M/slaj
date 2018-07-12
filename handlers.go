@@ -18,6 +18,7 @@ import (
 	"strings"
 	"time"
 	// externals
+	"github.com/gorilla/mux"
 	sessions "github.com/kataras/go-sessions"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -117,10 +118,13 @@ func showCommunity(w http.ResponseWriter, r *http.Request) {
 		err = post_rows.Scan(&row.ID, &row.CreatedBy, &timestamp, &row.Body, &row.Image, &row.PosterUsername, &row.PosterNickname, &row.PosterIcon)
 		row.CreatedAt = humanTiming(timestamp)
 		if err != nil {
-
 			fmt.Println(err)
-
 		}
+		db.QueryRow("SELECT COUNT(id) FROM comments WHERE post = ?", row.ID).Scan(&row.CommentCount)
+		db.QueryRow("SELECT comments.id, created_at, body, username, nickname, avatar FROM comments LEFT JOIN users ON users.id = created_by WHERE post = ? ORDER BY created_at DESC LIMIT 1", row.ID).
+			Scan(&row.CommentPreview.ID, &timestamp, &row.CommentPreview.Body, &row.CommentPreview.CommenterUsername, &row.CommentPreview.CommenterNickname, &row.CommentPreview.CommenterIcon)
+		row.CommentPreview.CreatedAt = humanTiming(timestamp)
+
 		posts = append(posts, row)
 
 	}
@@ -166,6 +170,27 @@ func showPost(w http.ResponseWriter, r *http.Request) {
 		Scan(&posts.ID, &posts.CreatedBy, &posts.CommunityID, &timestamp, &posts.Body, &posts.Image, &posts.PosterUsername, &posts.PosterNickname, &posts.PosterIcon)
 	posts.CreatedAt = humanTiming(timestamp)
 
+	db.QueryRow("SELECT COUNT(id) FROM comments WHERE post = ?", id[1]).Scan(&posts.CommentCount)
+
+	comment_rows, _ := db.Query("SELECT comments.id, created_by, created_at, body, image, username, nickname, avatar FROM comments LEFT JOIN users ON users.id = created_by WHERE post = ? ORDER BY created_at ASC", id[1])
+	var comments []comment
+
+	for comment_rows.Next() {
+
+		var row = comment{}
+		var timestamp time.Time
+
+		err = comment_rows.Scan(&row.ID, &row.CreatedBy, &timestamp, &row.Body, &row.Image, &row.CommenterUsername, &row.CommenterNickname, &row.CommenterIcon)
+		row.CreatedAt = humanTiming(timestamp)
+		if err != nil {
+
+			fmt.Println(err)
+
+		}
+		comments = append(comments, row)
+
+	}
+
 	community := QueryCommunity(strconv.Itoa(posts.CommunityID))
 	pjax := r.Header.Get("X-PJAX") == ""
 
@@ -175,6 +200,7 @@ func showPost(w http.ResponseWriter, r *http.Request) {
 		"User":      users,
 		"Community": community,
 		"Post":      posts,
+		"Comments":  comments,
 	}
 
 	err := templates.ExecuteTemplate(w, "post.html", data)
@@ -266,6 +292,100 @@ func createPost(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// the handler for comment creation
+func createComment(w http.ResponseWriter, r *http.Request) {
+
+	session := sessions.Start(w, r)
+
+	vars := mux.Vars(r)
+
+	post_id := vars["id"]
+	user_id := session.GetString("user_id")
+	body := r.FormValue("body")
+	image := r.FormValue("image")
+	url := r.FormValue("url")
+
+	if len(body) > 2000 {
+		http.Error(w, "Your comment is too long. (2000 characters maximum)", http.StatusBadRequest)
+		return
+	}
+	if len(body) == 0 && len(image) == 0 {
+		http.Error(w, "Your comment is empty.", http.StatusBadRequest)
+		return
+	}
+
+	stmt, err := db.Prepare("INSERT comments SET created_by=?, post=?, body=?, image=?, url=?")
+	if err == nil {
+
+		// If there's no errors, we can go ahead and execute the statement.
+		_, err := stmt.Exec(&user_id, &post_id, &body, &image, &url)
+		if err != nil {
+
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+
+		}
+
+		var comments = comment{}
+		var timestamp time.Time
+
+		db.QueryRow("SELECT comments.id, created_by, created_at, body, image, username, nickname, avatar FROM comments LEFT JOIN users ON users.id = created_by WHERE created_by = ? ORDER BY created_at DESC LIMIT 1", user_id).
+			Scan(&comments.ID, &comments.CreatedBy, &timestamp, &comments.Body, &comments.Image, &comments.CommenterUsername, &comments.CommenterNickname, &comments.CommenterIcon)
+		comments.CreatedAt = humanTiming(timestamp)
+
+		var data = map[string]interface{}{
+
+			"Comment": comments,
+		}
+
+		err = templates.ExecuteTemplate(w, "create_comment.html", data)
+
+		if err != nil {
+
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+
+		}
+
+		var commentTpl bytes.Buffer
+		var commentPreviewTpl bytes.Buffer
+
+		templates.ExecuteTemplate(&commentTpl, "create_comment.html", data)
+		templates.ExecuteTemplate(&commentPreviewTpl, "comment_preview.html", data)
+
+		var msg wsMessage
+		var community_id string
+
+		db.QueryRow("SELECT community_id FROM posts WHERE id = ?", post_id).Scan(&community_id)
+
+		for client := range clients {
+			if clients[client].OnPage == "/posts/"+post_id && clients[client].UserID != strconv.Itoa(comments.CreatedBy) {
+				msg.Type = "comment"
+				msg.Content = commentTpl.String()
+				err := client.WriteJSON(msg)
+				if err != nil {
+					fmt.Println(err)
+					client.Close()
+					delete(clients, client)
+				}
+			} else if clients[client].OnPage == "/communities/"+community_id {
+				msg.Type = "commentPreview"
+				msg.ID = post_id
+				msg.Content = commentPreviewTpl.String()
+				err := client.WriteJSON(msg)
+				if err != nil {
+					fmt.Println(err)
+					client.Close()
+					delete(clients, client)
+				}
+			}
+		}
+
+		return
+
+	}
+
+}
+
 // Upload an image.
 func uploadImage(w http.ResponseWriter, r *http.Request) {
 	pretendconfigtype := "kek.gg" // temporary config variables to mimic a configuration file
@@ -289,6 +409,31 @@ func uploadImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	return
+}
+
+// the handler for showing a single user page
+func showUser(w http.ResponseWriter, r *http.Request) {
+	session := sessions.Start(w, r)
+
+	if len(session.GetString("username")) == 0 {
+		http.Redirect(w, r, "/act/login", 301)
+	}
+
+	username := strings.Split(r.URL.RequestURI(), "/users/")
+	user := QueryUser(username[1])
+	pjax := r.Header.Get("X-PJAX") == ""
+
+	var data = map[string]interface{}{
+		"Title":     user.Username,
+		"Pjax":      pjax,
+		"User":      user,
+	}
+
+	err := templates.ExecuteTemplate(w, "user.html", data)
+	
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // the handler for user registration
@@ -317,7 +462,7 @@ func register(w http.ResponseWriter, r *http.Request) {
 	users := QueryUser(username)
 
 	if (user{}) == users {
-		if len(username) > 32 || len(username) < 4 {
+		if len(username) > 32 || len(username) < 3 {
 			http.Error(w, "invalid username length sorry br0o0o0o0o0o0", http.StatusBadRequest)
 			return
 		}

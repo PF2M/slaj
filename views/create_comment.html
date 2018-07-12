@@ -1,0 +1,22 @@
+<li id="{{.Comment.ID}}" data-href="/comments/{{.Comment.ID}}" class="post other trigger">
+    <a href="/users/Aphistemi" class="icon-container"><img src="{{.Comment.CommenterIcon}}" class="icon"></a>
+    <div class="body">
+        <div class="header">
+            <p class="user-name"><a href="/users/{{.Comment.CommenterUsername}}">{{.Comment.CommenterNickname}}</a></p>
+            <p class="timestamp-container">
+                <a class="timestamp" href="/comments/{{.Comment.ID}}">{{.Comment.CreatedAt}}</a>
+                <span class="spoiler-status"> · Spoilers</span>
+            </p>
+        </div>
+        <div class="reply-content-text">{{.Comment.Body}}</div>
+        {{if .Comment.Image}}
+            <div class="screenshot-container still-image">
+                <img src="{{.Comment.Image}}">
+            </div>
+        {{end}}
+        <div class="reply-meta">
+            <button type="button" class="symbol submit yeah-button" data-is-in-reply-list="1" data-feeling="" data-action="/comments/{{.Comment.ID}}/yeah" data-url-id="{{.Comment.ID}}"><span class="yeah-button-text">Yeah!</span></button>
+            <div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">0</span></div>
+        </div>
+    </div>
+</li>

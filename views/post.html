@@ -1,48 +1,109 @@
-{{if .Pjax}}
-	{{template "header.html" .}}
-{{end}}
+{{if .Pjax}} {{template "header.html" .}} {{end}}
 <div id="container">
+    <div id="main-body" class="">
+        <div class="main-column replyform-bottom">
+            <div class="post-list-outline">
+                <section id="post-content" class="post post-subtype-default">
+                    <header class="community-container">
+                        <h1 class="community-container-heading">
+                            <a href="/communities/{{.Community.ID}}">
+                                <img src="{{.Community.Icon}}" class="community-icon">{{.Community.Title}}
+                            </a>
+                        </h1>
+                    </header>
+                    <div class="user-content">
+                        <a href="/users/{{.Post.PosterUsername}}" class="icon-container">
+                            <img src="{{.Post.PosterIcon}}" class="icon">
+                        </a>
+                        <div class="user-name-content">
+                            <p class="user-name">
+                                <a href="/users/{{.Post.PosterUsername}}">{{.Post.PosterNickname}}</a>
+                                <span class="user-id">{{.Post.PosterUsername}}</span>
+                            </p>
+                            <p class="timestamp-container">
+                                <span class="timestamp">{{.Post.CreatedAt}}</span>
+                                <span class="spoiler-status">·Spoilers</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="body">
+                        <div id="the-post">
+                            <p class="post-content-text">{{.Post.Body}}</p>
+                            {{if .Post.Image}}
+                            <div class="screenshot-container still-image">
+                                <img src="{{.Post.Image}}">
+                            </div>
+                            {{end}}
+                            <div class="post-meta">
+                                <button type="button" class="symbol submit yeah-button" data-feeling="" data-action="/posts/{{.Post.ID}}/yeah" data-url-id="{{.Post.ID}}">
+                                    <span class="yeah-button-text">Yeah!</span>
+                                </button>
+                                <div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">0</span></div>
+                                <div class="reply symbol"><span class="symbol-label">Comments</span><span class="reply-count">{{.Post.CommentCount}}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div id="reply-content">
+                    <h2 class="reply-label">Comments</h2>
+                    {{if .Comments}}
+                    {{else}}
+                        <div class="no-reply-content"><div>
+                            <p>This post has no comments.</p>
+                        </div></div>
+                    {{end}}
+                    <ul class="list reply-list test-reply-list">
+                        {{range $comment := .Comments}}
+                            <li id="{{$comment.ID}}" data-href="/comments/{{$comment.ID}}" class="post other trigger">
+                                <a href="/users/Aphistemi" class="icon-container"><img src="{{$comment.CommenterIcon}}" class="icon"></a>
+                                <div class="body">
+                                    <div class="header">
+                                        <p class="user-name"><a href="/users/{{$comment.CommenterUsername}}">{{$comment.CommenterNickname}}</a></p>
+                                        <p class="timestamp-container">
+                                            <a class="timestamp" href="/comments/{{$comment.ID}}">{{$comment.CreatedAt}}</a>
+                                            <span class="spoiler-status"> · Spoilers</span>
+                                        </p>
+                                    </div>
+                                    <div class="reply-content-text">{{$comment.Body}}</div>
+                                    {{if $comment.Image}}
+                                        <div class="screenshot-container still-image">
+                                            <img src="{{$comment.Image}}">
+                                        </div>
+                                    {{end}}
+                                    <div class="reply-meta">
+                                        <button type="button" class="symbol submit yeah-button" data-is-in-reply-list="1" data-feeling="" data-action="/comments/{{$comment.ID}}/yeah" data-url-id="{{$comment.ID}}"><span class="yeah-button-text">Yeah!</span></button>
+                                        <div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">0</span></div>
+                                    </div>
+                                </div>
+                            </li>
+                        {{end}}
+                    </ul>
+                </div>
+                <h2 class="reply-label">Add a Comment</h2>
 
-<div id="main-body" class="">
-<div class="main-column replyform-bottom"><div class="post-list-outline">
-<section id="post-content" class="post post-subtype-default">
-<header class="community-container">
-<h1 class="community-container-heading">
-<a href="/communities/{{.Community.ID}}"><img src="{{.Community.Icon}}" class="community-icon">{{.Community.Title}}</a>
-</h1>
-</header>
-<div class="user-content">
-<a href="/users/{{.Post.PosterUsername}}" class="icon-container"><img src="{{.Post.PosterIcon}}" class="icon"></a>
-<div class="user-name-content">
-<p class="user-name"><a href="/users/{{.Post.PosterUsername}}">{{.Post.PosterNickname}}</a><span class="user-id">{{.Post.PosterUsername}}</span></p>
-<p class="timestamp-container">
-<span class="timestamp">{{.Post.CreatedAt}}</span>
-<span class="spoiler-status">·Spoilers</span>
-</p>
-</div>
-</div>
-<div class="body">
-<div id="the-post">
-<p class="post-content-text">{{.Post.Body}}</p>
-{{if .Post.Image}}
-    <div class="screenshot-container still-image">
-        <img src="{{.Post.Image}}">
+                <form id="reply-form" class="for-identified-user" method="post" action="/posts/{{.Post.ID}}/comments">
+                    <div class="textarea-with-menu active-text">
+                        <div class="textarea-container">
+                            <textarea name="body" class="textarea-text textarea" maxlength="2200" placeholder="Add a comment here." data-required=""></textarea>
+                        </div>
+                    </div>
+                    <label class="file-button-container">
+                        <span class="input-label">Image <span>Powered by kek.gg</span><span style="display: none;">...</span><span style="display: none;"></span></span>
+                        <span class="button file-upload-button">Upload</span>
+                        <input accept="image/*" type="file" class="file-button none">
+                        <input type="hidden" name="image">
+                        <div class="screenshot-container still-image preview-container" style="display: none;">
+                            <img class="preview-image">
+                        </div>
+                        <script src="/assets/js/image.js"></script>
+                    </label>
+                    <div class="form-buttons">
+                        <input type="submit" class="black-button reply-button disabled" value="Send" data-community-id="{{.Community.ID}}" data-url-id="{{.Post.ID}}" data-post-content-type="text" data-post-with-screenshot="nodata" disabled="">
+                    </div>
+                </form>
+
+            </div>
+        </div>
     </div>
-{{end}}
-<div class="post-meta">
-<button type="button" class="symbol submit yeah-button" data-feeling="" data-action="/posts/{{.Post.ID}}/yeah" data-url-id="{{.Post.ID}}"><span class="yeah-button-text">Yeah!</span></button>
-<div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">0</span></div>
-<div class="reply symbol"><span class="symbol-label">Comments</span><span class="reply-count">0</span></div>
 </div>
-</div>
-</div></section>
-
-
-
-</div>
-</div>
-</div>
-</div>
-{{if .Pjax}}
-    {{template "footer.html"}}
-{{end}}
+{{if .Pjax}} {{template "footer.html"}} {{end}}

@@ -1,0 +1,16 @@
+<div class="recent-reply-content">
+    <div id="" tabindex="0" class="recent-reply trigger">
+        <a href="/users/{{.Comment.CommenterUsername}}" class="icon-container">
+            <img src="{{.Comment.CommenterIcon}}" class="icon">
+        </a>
+        <p class="user-name"><a href="/users/{{.Comment.CommenterUsername}}">{{.Comment.CommenterNickname}}</a></p>
+        <p class="timestamp-container">
+            <a class="timestamp" href="/comments/{{.Comment.ID}}">{{.Comment.CreatedAt}}</a>
+        </p>
+        <div class="body">
+            <div class="post-content">
+                <p class="recent-reply-content-text">{{.Comment.Body}}</p>
+            </div>
+        </div>
+    </div>
+</div>

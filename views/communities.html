@@ -53,7 +53,7 @@
                         <div class="list post-list js-post-list" data-next-page-url="">
                             {{if .Posts}}
                                 {{range $post := .Posts}}
-                                    <div id="" data-href="/posts/{{$post.ID}}" class="post post-subtype-default trigger" tabindex="0">
+                                    <div id="{{$post.ID}}" data-href="/posts/{{$post.ID}}" class="post post-subtype-default trigger" tabindex="0">
                                         <a href="/users/{{$post.PosterUsername}}" class="icon-container offline"><img src="{{$post.PosterIcon}}" class="icon"></a>
                                         <p class="user-name"><a href="/users/{{$post.PosterUsername}}">{{$post.PosterNickname}}</a></p>
                                         <p class="timestamp-container">
@@ -70,8 +70,34 @@
                                             <div class="post-meta">
                                                 <button type="button" class="symbol submit yeah-button" data-feeling="" data-action="/posts/{{$post.ID}}/yeah" data-url-id="{{$post.ID}}"><span class="yeah-button-text">Yeah!</span></button>
                                                 <div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">0</span></div>
-                                                <div class="reply symbol"><span class="symbol-label">Comments</span><span class="reply-count">0</span></div>
+                                                <div class="reply symbol"><span class="symbol-label">Comments</span><span class="reply-count">{{$post.CommentCount}}</span></div>
                                             </div>
+
+                                            {{if $post.CommentPreview.Body}}
+
+                                                <div class="recent-reply-content">
+                                                    {{if gt $post.CommentCount 1}}
+                                                        <div class="recent-reply-read-more-container" tabindex="0">
+                                                            View all comments ({{$post.CommentCount}})
+                                                        </div>
+                                                    {{end}}
+                                                    <div id="" tabindex="0" class="recent-reply trigger">
+                                                        <a href="/users/{{$post.CommentPreview.CommenterUsername}}" class="icon-container">
+                                                            <img src="{{$post.CommentPreview.CommenterIcon}}" class="icon"></a>
+                                                        <p class="user-name"><a href="/users/{{$post.CommentPreview.CommenterUsername}}">{{$post.CommentPreview.CommenterNickname}}</a></p>
+                                                        <p class="timestamp-container">
+                                                            <a class="timestamp" href="/comments/{{$post.CommentPreview.ID}}">{{$post.CommentPreview.CreatedAt}}</a>
+                                                        </p>
+                                                        <div class="body">
+                                                            <div class="post-content">
+                                                                <p class="recent-reply-content-text">{{$post.CommentPreview.Body}}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            {{end}}
+
                                         </div>
                                     </div>
                                 {{end}}

@@ -39,6 +39,25 @@ type post struct {
 	PosterUsername string
 	PosterNickname string
 	PosterIcon     string
+	CommentCount   int
+	CommentPreview comment
+}
+
+// Variable declarations for comments.
+type comment struct {
+	ID                int
+	CreatedBy         int
+	PostID            int
+	CreatedAt         string
+	Body              string
+	Image             string
+	URL               string
+	IsSpoiler         bool
+	IsRm              bool
+	IsRmByAdmin       bool
+	CommenterUsername string
+	CommenterNickname string
+	CommenterIcon     string
 }
 
 // Variable declarations for communities.
@@ -64,5 +83,6 @@ type wsSession struct {
 // Variable declarations for websocket messages.
 type wsMessage struct {
 	Type    string `json:"type"`
+	ID      string `json:"id"`
 	Content string `json:"content"`
 }
