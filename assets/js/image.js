@@ -16,7 +16,7 @@ function error(error) {
     Olv.showMessage("Error", error);
 }
 
-$(".file-button").on("change", function() {
+$(document).on("change", ".file-button", function() {
     if(this.files.length) {
         Olv.Form.toggleDisabled($("input.post-button"), true);
         $(".file-button").attr("disabled", "disabled");

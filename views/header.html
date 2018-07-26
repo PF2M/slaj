@@ -21,7 +21,9 @@
 	<link rel="stylesheet" type="text/css" href="/assets/css/offdevice.css">
 	<script src="/assets/js/jslibs.js"></script>
 	<script src="/assets/js/slaj.js"></script>
-	<script src="/assets/js/websocket.js"></script>
+	{{if .CurrentUser}}
+		<script src="/assets/js/websocket.js"></script>
+	{{end}}
 </head>
 
 <body class="">
@@ -32,19 +34,19 @@
 	<div id="sub-body">
 		<menu id="global-menu">
 			<li id="global-menu-logo"><h1><a href="/"><img src="/assets/img/nova-logo.png" alt="Nova"></a></h1></li>
-			{{if .IsGuest}}
+			{{if not .CurrentUser}}
 				<li id="global-menu-login">
-					<a href="/act/login" class="login">
-						<input type="image" alt="Sign in" src="/s/img/sign-in.png">
+					<a href="/login" class="login">
+						<input type="image" alt="Sign in" src="/assets/img/sign-in.png">
 					</a>
 				</li>
 			{{else}}
 				<li id="global-menu-list">
 					<ul>
 						<li id="global-menu-mymenu">
-							<a href="/users/{{.User.Username}}">
+							<a href="/users/{{.CurrentUser.Username}}">
 								<span class="icon-container">
-									<img src="{{.User.Avatar}}" alt="User Page">
+									<img src="{{.CurrentUser.Avatar}}" alt="User Page">
 								</span>
 								<span>User Page</span>
 							</a>
@@ -76,3 +78,4 @@
 			{{end}}
 		</menu>
 	</div>
+	<div id="container">

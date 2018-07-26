@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+
 	// externals
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
@@ -26,13 +27,13 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var templates = template.Must(template.ParseFiles("views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/post.html", "views/create_post.html", "views/create_comment.html", "views/comment_preview.html", "views/user.html"))
+var templates = template.Must(template.ParseFiles("views/auth/login.html", "views/auth/signup.html", "views/index.html", "views/header.html", "views/footer.html", "views/communities.html", "views/post.html", "views/create_post.html", "views/create_comment.html", "views/comment_preview.html", "views/profile_sidebar.html", "views/user.html"))
 
 // Main function.
 func main() {
 
 	// Connect to the database.
-	db, err = sql.Open("mysql", "root:root@tcp(127.0.0.1:3306)/slaj?parseTime=true&charset=utf8mb4,utf8")
+	db, err = sql.Open("mysql", "root:@unix(/tmp/mysql.sock)/slaj?parseTime=true&charset=utf8mb4,utf8")
 	if err != nil {
 
 		// we were unable to connect to the database
@@ -63,16 +64,26 @@ func main() {
 	r.HandleFunc("/", index)
 
 	// Auth routes.
-	r.HandleFunc("/act/register", register)
-	r.HandleFunc("/act/login", login)
+	r.HandleFunc("/signup", signup)
+	r.HandleFunc("/login", login)
 	r.HandleFunc("/act/logout", logout)
 
 	// User routes.
 	r.HandleFunc("/users/{username}", showUser)
-	
+
 	// Post routes.
 	r.HandleFunc("/posts/{id:[0-9]+}", showPost)
 	r.HandleFunc("/posts/{id:[0-9]+}/comments", createComment)
+
+	// Yeah routes.
+	r.HandleFunc("/posts/{id:[0-9]+}/yeah", createPostYeah)
+	r.HandleFunc("/posts/{id:[0-9]+}/yeahu", deletePostYeah)
+	r.HandleFunc("/comments/{id:[0-9]+}/yeah", createCommentYeah)
+	r.HandleFunc("/comments/{id:[0-9]+}/yeahu", deleteCommentYeah)
+
+	// Follow routes.
+	r.HandleFunc("/users/{username}/follow", createFollow)
+	r.HandleFunc("/users/{username}/unfollow", deleteFollow)
 
 	// Community routes.
 	r.HandleFunc("/communities/{id:[0-9]+}", showCommunity)

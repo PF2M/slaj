@@ -65,6 +65,7 @@ func QueryUser(username string) user {
 		ip,
 		level,
 		role,
+		online,
 		last_seen,
 		color,
 		yeah_notifications
@@ -80,11 +81,39 @@ func QueryUser(username string) user {
 			&users.IP,
 			&users.Level,
 			&users.Role,
+			&users.Online,
 			&users.LastSeen,
 			&users.Color,
 			&users.YeahNotifications,
 		)
 	return users
+}
+
+// Find a profile by user ID.
+func QueryProfile(id int) profile {
+	var profiles = profile{}
+	err = db.QueryRow(`
+		SELECT user,
+		created_at,
+		nnid,
+		gender,
+		region,
+		comment,
+		nnid_visibility,
+		yeah_visibility,
+		reply_visibility
+		FROM profiles WHERE user=?
+		`, id).
+		Scan(&profiles.User,
+			&profiles.CreatedAt,
+			&profiles.NNID,
+			&profiles.Gender,
+			&profiles.Region,
+			&profiles.Comment,
+			&profiles.NNIDVisibility,
+			&profiles.YeahVisibility,
+			&profiles.ReplyVisibility)
+	return profiles
 }
 
 // Find a community by ID.

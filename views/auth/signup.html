@@ -1,0 +1,27 @@
+{{template "header.html" .}}
+<div id="main-body" class="guest">
+	<div class="main-column center">
+		<div class="post-list-outline login-page">
+			<form method="post" onload="">
+				<img src="/assets/img/nova-logo.png">
+				<p class="lh">Sign Up</p>
+				<p>Create a Nova account to use the website bitch.</p><br>
+				<p>You <strong>must</strong> be 13 years of age or older to join, no exceptions.<br>If you are suspected to be younger than 12 years old, the moderators will decide what to do with you.</p>
+				<h3 class="label"><label><span class="red">*</span> User ID: <input type="text" class="auth-input" name="username" maxlength="32" minlength="4" placeholder="ID"></label></h3>
+				<h3 class="label"><label><span class="red">*</span> Nickname: <input type="text" class="auth-input" name="nickname" maxlength="32" placeholder="Nick/Mii name?"></label></h3>
+				<h3 class="label"><label><span class="red">*</span> Avatar URL: <input type="text" class="auth-input" name="avatar" maxlength="255" placeholder="Avatar"></label></h3>
+				<h3 class="label"><label><span class="red">%</span> E-mail address: <input type="email" class="auth-input" name="email" maxlength="254" placeholder="Email"></label></h3>
+				<h3 class="label"><label><span class="red">*</span> Password: <input type="password" class="auth-input" name="password" maxlength="32" placeholder="Password"></label></h3>
+
+				<p class="red" style="margin-bottom:6px"></p>
+				<button type="submit" class="button">Create account</button>
+				<div class="ll">
+					<p>All fields with a red asterisk (<span class="red">*</span>) are required.</p>
+					<p>You will be able to change your avatar after you sign up.</p>
+					<p><span class="red">%</span>: If you don't fill in your email address, you can't reset your password until you have one.</p>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+{{template "footer.html"}}

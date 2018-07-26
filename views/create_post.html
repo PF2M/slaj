@@ -1,10 +1,10 @@
-<div id="" data-href="/posts/{{.Post.ID}}" class="post post-subtype-default trigger" tabindex="0">
+<div id="{{.Post.ID}}" data-href="/posts/{{.Post.ID}}" class="post post-subtype-default trigger" tabindex="0">
     <a href="/users/{{.Post.PosterUsername}}" class="icon-container offline"><img src="{{.Post.PosterIcon}}" class="icon"></a>
     <p class="user-name"><a href="/users/{{.Post.PosterUsername}}">{{.Post.PosterNickname}}</a></p>
     <p class="timestamp-container">
         <span class="spoiler-status">Spoilers·</span>
         <a class="timestamp" href="/posts/{{.Post.ID}}">{{.Post.CreatedAt}}</a>
-    </p>
+    </p> 
     <div class="body post-content">
         <p class="post-content-text">{{.Post.Body}}</p>
         {{if .Post.Image}}
@@ -13,7 +13,9 @@
             </div>
         {{end}}
         <div class="post-meta">
-            <button type="button" class="symbol submit yeah-button" data-feeling="" data-action="/posts/{{.Post.ID}}/yeah" data-url-id="{{.Post.ID}}"><span class="yeah-button-text">Yeah!</span></button>
+            <button type="button" {{if not .CanYeah}} disabled{{end}} class="symbol submit yeah-button
+            {{if not .CanYeah}} disabled{{end}}
+            " data-feeling="" data-action="/posts/{{.Post.ID}}/yeah" data-url-id="{{.Post.ID}}"><span class="yeah-button-text">Yeah!</span></button>
             <div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">0</span></div>
             <div class="reply symbol"><span class="symbol-label">Comments</span><span class="reply-count">0</span></div>
         </div>

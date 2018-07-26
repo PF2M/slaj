@@ -1,113 +1,136 @@
+{{if eq .Offset 25}}
 {{if .Pjax}}
     {{template "header.html" .}}
+{{else}}
+    <title>{{.Title}} - slaj</title>
 {{end}}
-<div id="container">
-    <div id="main-body" class="community-top" csrf-token="">
-        <div id="sidebar">
-            <section class="sidebar-container" id="sidebar-community">
-                <span id="sidebar-cover">
-                    <a href="/communities/{{.Community.ID}}"><img src="{{.Community.Banner}}"></a>
-                </span>
-                <header id="sidebar-community-body">
-                    <span id="sidebar-community-img">
-                        <span class="icon-container">
-                            <a href="/communities/{{.Community.ID}}"><img src="{{.Community.Icon}}" class="icon"></a>
-                        </span>
+<div id="main-body" class="community-top" csrf-token="">
+    <div id="sidebar">
+        <section class="sidebar-container" id="sidebar-community">
+            <span id="sidebar-cover">
+                <a href="/communities/{{.Community.ID}}"><img src="{{.Community.Banner}}"></a>
+            </span>
+            <header id="sidebar-community-body">
+                <span id="sidebar-community-img">
+                    <span class="icon-container">
+                        <a href="/communities/{{.Community.ID}}"><img src="{{.Community.Icon}}" class="icon"></a>
                     </span>
-                    <h1 class="community-name"><a href="/communities/{{.Community.ID}}">{{ .Community.Title }}</a></h1>
-                </header>
-                <div class="community-description js-community-description">
-                    <p class="text js-truncated-text">{{.Community.Description}}</p>
-                </div>
-            </section>
-        </div>
-        <div class="main-column">
-            <div class="post-list-outline">
-                <div id="postsz" class="">
-
-
-                    <form id="post-form" method="post" action="/communities/{{.Community.ID}}/posts" class="folded" data-post-subtype="default" name="test-post-default-form">
-                        <input type="hidden" name="community" value="{{.Community.ID}}">
-                        <div class="textarea-with-menu active-text">
-                            <div class="textarea-container">
-                                <textarea name="body" class="textarea-text textarea" maxlength="2200" placeholder="Share your thoughts in a post to {{.Community.Title}}" data-open-folded-form="" data-required=""></textarea>
-                            </div>
+                </span>
+                <h1 class="community-name"><a href="/communities/{{.Community.ID}}">{{ .Community.Title }}</a></h1>
+            </header>
+            <div class="community-description js-community-description">
+                <p class="text js-truncated-text">{{.Community.Description}}</p>
+            </div>
+        </section>
+    </div>
+    <div class="main-column">
+        <div class="post-list-outline">
+            <div id="postsz" class="">
+                <form id="post-form" method="post" action="/communities/{{.Community.ID}}/posts" class="folded" data-post-subtype="default" name="test-post-default-form">
+                    <input type="hidden" name="community" value="{{.Community.ID}}">
+                    <div class="textarea-with-menu active-text">
+                        <div class="textarea-container">
+                            <textarea name="body" class="textarea-text textarea" maxlength="2200" placeholder="Share your thoughts in a post to {{.Community.Title}}" data-open-folded-form="" data-required=""></textarea>
                         </div>
-                        <label class="file-button-container">
-                            <span class="input-label">Image <span>Powered by kek.gg</span><span style="display: none;">...</span><span style="display: none;"></span></span>
-                            <span class="button file-upload-button">Upload</span>
-                            <input accept="image/*" type="file" class="file-button none">
-                            <input type="hidden" name="image">
-                            <div class="screenshot-container still-image preview-container" style="display: none;">
-                                <img class="preview-image">
-                            </div>
-                            <script src="/assets/js/image.js"></script>
-                        </label>
-                        <div class="form-buttons">
-                            <input type="submit" class="black-button post-button disabled" value="Send" data-community-id="{{.Community.ID}}" data-post-content-type="text" data-post-with-screenshot="nodata" disabled="">
+                    </div>
+                    <label class="file-button-container">
+                        <span class="input-label">Image <span>Powered by kek.gg</span><span style="display: none;">...</span><span style="display: none;"></span></span>
+                        <span class="button file-upload-button">Upload</span>
+                        <input accept="image/*" type="file" class="file-button none">
+                        <input type="hidden" name="image">
+                        <div class="screenshot-container still-image preview-container" style="display: none;">
+                            <img class="preview-image">
                         </div>
-                    </form>
-
-
-                    <div class="body-content" id="community-post-list">
-                        <div class="list post-list js-post-list" data-next-page-url="">
-                            {{if .Posts}}
-                                {{range $post := .Posts}}
-                                    <div id="{{$post.ID}}" data-href="/posts/{{$post.ID}}" class="post post-subtype-default trigger" tabindex="0">
-                                        <a href="/users/{{$post.PosterUsername}}" class="icon-container offline"><img src="{{$post.PosterIcon}}" class="icon"></a>
-                                        <p class="user-name"><a href="/users/{{$post.PosterUsername}}">{{$post.PosterNickname}}</a></p>
-                                        <p class="timestamp-container">
-                                            <span class="spoiler-status">Spoilers·</span>
-                                        <a class="timestamp" href="/posts/{{$post.ID}}">{{$post.CreatedAt}}</a>
-                                        </p>
-                                        <div class="body post-content">
-                                            <p class="post-content-text">{{$post.Body}}</p>
-                                            {{if $post.Image}}
-                                                <div class="screenshot-container still-image">
-                                                    <img src="{{$post.Image}}">
-                                                </div>
-                                            {{end}}
-                                            <div class="post-meta">
-                                                <button type="button" class="symbol submit yeah-button" data-feeling="" data-action="/posts/{{$post.ID}}/yeah" data-url-id="{{$post.ID}}"><span class="yeah-button-text">Yeah!</span></button>
-                                                <div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">0</span></div>
-                                                <div class="reply symbol"><span class="symbol-label">Comments</span><span class="reply-count">{{$post.CommentCount}}</span></div>
+                        <script src="/assets/js/image.js"></script>
+                    </label>
+                    <div class="form-buttons">
+                        <input type="submit" class="black-button post-button disabled" value="Send" data-community-id="{{.Community.ID}}" data-post-content-type="text" data-post-with-screenshot="nodata" disabled="">
+                    </div>
+                </form>
+                <div class="body-content" id="community-post-list">
+                    {{end}}
+                    <div class="list post-list js-post-list" data-next-page-url="{{if .Posts}}?&offset={{.Offset}}{{end}}">
+                        {{if .Posts}}
+                            {{$user_id := .CurrentUser.ID}}
+                            {{range $post := .Posts}}
+                                <div id="{{$post.ID}}" data-href="/posts/{{$post.ID}}" class="post post-subtype-default trigger" tabindex="0">
+                                    <a href="/users/{{$post.PosterUsername}}" username="{{$post.PosterUsername}}" class="icon-container
+                                        {{if $post.PosterOnline}}
+                                            online
+                                        {{else}}
+                                            offline
+                                        {{end}}
+                                    "><img src="{{$post.PosterIcon}}" class="icon"></a>
+                                    <p class="user-name"><a href="/users/{{$post.PosterUsername}}">{{$post.PosterNickname}}</a></p>
+                                    <p class="timestamp-container">
+                                        <span class="spoiler-status">Spoilers·</span>
+                                    <a class="timestamp" href="/posts/{{$post.ID}}">{{$post.CreatedAt}}</a>
+                                    </p>
+                                    <div class="body post-content">
+                                        <p class="post-content-text">{{$post.Body}}</p>
+                                        {{if $post.Image}}
+                                            <div class="screenshot-container still-image">
+                                                <img src="{{$post.Image}}">
                                             </div>
+                                        {{end}}
+                                        <div class="post-meta">
+                                            <button type="button" {{if eq $post.CreatedBy $user_id}} disabled{{end}} class="symbol submit yeah-button
+                                            {{if $post.Yeahed}} yeah-added{{end}}
+                                            {{if eq $post.CreatedBy $user_id}} disabled{{end}}
+                                            " data-feeling="" data-action="/posts/{{$post.ID}}/yeah" data-url-id="{{$post.ID}}"><span class="yeah-button-text">
+                                                {{if $post.Yeahed}}
+                                                    Unyeah
+                                                {{else}}
+                                                    Yeah!
+                                                {{end}}
+                                            </span></button>
+                                            <div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">{{$post.YeahCount}}</span></div>
+                                            <div class="reply symbol"><span class="symbol-label">Comments</span><span class="reply-count">{{$post.CommentCount}}</span></div>
+                                        </div>
 
-                                            {{if $post.CommentPreview.Body}}
+                                        {{if $post.CommentPreview.Body}}
 
-                                                <div class="recent-reply-content">
-                                                    {{if gt $post.CommentCount 1}}
-                                                        <div class="recent-reply-read-more-container" tabindex="0">
-                                                            View all comments ({{$post.CommentCount}})
-                                                        </div>
+                                            <div class="recent-reply-content">
+                                                {{if gt $post.CommentCount 1}}
+                                                    <div class="recent-reply-read-more-container" tabindex="0">
+                                                        View all comments ({{$post.CommentCount}})
+                                                    </div>
+                                                {{end}}
+                                                <div id="" tabindex="0" class="recent-reply trigger">
+                                                    <a href="/users/{{$post.CommentPreview.CommenterUsername}}" username="{{$post.CommentPreview.CommenterUsername}}" class="icon-container
+                                                    {{if $post.CommentPreview.CommenterOnline}}
+                                                        online
+                                                    {{else}}
+                                                        offline
                                                     {{end}}
-                                                    <div id="" tabindex="0" class="recent-reply trigger">
-                                                        <a href="/users/{{$post.CommentPreview.CommenterUsername}}" class="icon-container">
-                                                            <img src="{{$post.CommentPreview.CommenterIcon}}" class="icon"></a>
-                                                        <p class="user-name"><a href="/users/{{$post.CommentPreview.CommenterUsername}}">{{$post.CommentPreview.CommenterNickname}}</a></p>
-                                                        <p class="timestamp-container">
-                                                            <a class="timestamp" href="/comments/{{$post.CommentPreview.ID}}">{{$post.CommentPreview.CreatedAt}}</a>
-                                                        </p>
-                                                        <div class="body">
-                                                            <div class="post-content">
-                                                                <p class="recent-reply-content-text">{{$post.CommentPreview.Body}}</p>
-                                                            </div>
+                                                    ">
+                                                        <img src="{{$post.CommentPreview.CommenterIcon}}" class="icon"></a>
+                                                    <p class="user-name"><a href="/users/{{$post.CommentPreview.CommenterUsername}}">{{$post.CommentPreview.CommenterNickname}}</a></p>
+                                                    <p class="timestamp-container">
+                                                        <a class="timestamp" href="/comments/{{$post.CommentPreview.ID}}">{{$post.CommentPreview.CreatedAt}}</a>
+                                                    </p>
+                                                    <div class="body">
+                                                        <div class="post-content">
+                                                            <p class="recent-reply-content-text">{{$post.CommentPreview.Body}}</p>
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
 
-                                            {{end}}
+                                        {{end}}
 
-                                        </div>
                                     </div>
-                                {{end}}
-                            {{else}}
+                                </div>
+                            {{end}}
+                        {{else}}
+                            {{if eq .Offset 25}}
                                 <div class="no-content">
                                     <p>No posts.</p>
                                 </div>
                             {{end}}
-                        </div>
+                        {{end}}
                     </div>
+                    {{if eq .Offset 25}}
                 </div>
             </div>
         </div>
@@ -115,4 +138,5 @@
 </div>
 {{if .Pjax}}
     {{template "footer.html"}}
+{{end}}
 {{end}}

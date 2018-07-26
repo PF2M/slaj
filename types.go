@@ -19,16 +19,34 @@ type user struct {
 	IP                string
 	Level             int
 	Role              int
+	Online            bool
 	LastSeen          string
 	Color             string
 	YeahNotifications bool
+}
+
+// Variable declarations for profiles.
+type profile struct {
+	User            int
+	CreatedAt       string
+	NNID            string
+	Gender          int
+	Region          string
+	Comment         string
+	NNIDVisibility  int
+	YeahVisibility  int
+	ReplyVisibility int
+	FollowingCount  int
+	FollowerCount   int
+	PostCount       int
+	CommentCount    int
+	YeahCount       int
 }
 
 // Variable declarations for posts.
 type post struct {
 	ID             int
 	CreatedBy      int
-	CommunityID    int
 	CreatedAt      string
 	Body           string
 	Image          string
@@ -39,6 +57,12 @@ type post struct {
 	PosterUsername string
 	PosterNickname string
 	PosterIcon     string
+	PosterOnline   bool
+	CommunityID    int
+	CommunityName  string
+	CommunityIcon  string
+	Yeahed         bool
+	YeahCount      int
 	CommentCount   int
 	CommentPreview comment
 }
@@ -58,6 +82,15 @@ type comment struct {
 	CommenterUsername string
 	CommenterNickname string
 	CommenterIcon     string
+	CommenterOnline   bool
+	Yeahed            bool
+	YeahCount         int
+}
+
+type yeah struct {
+	ID       int
+	Username string
+	Avatar   string
 }
 
 // Variable declarations for communities.

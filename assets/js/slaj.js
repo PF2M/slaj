@@ -1445,46 +1445,46 @@ var Olv = Olv || {};
 		});
     }
     ,
-    b.Entry.toggleEmpathy = function(a) {
-        var c = b.Entry.isEmpathyAdded(a)
+    b.Entry.toggleYeah = function(a) {
+        var c = b.Entry.isYeahAdded(a)
           , d = !c
           , e = a.attr("data-action");
         c && (e += "u"),
-        a.trigger("olv:entry:empathy:toggle", [d]);
+        a.trigger("olv:entry:yeah:toggle", [d]);
         var f = b.Form.post(e, null, a).done(function() {
-            a.trigger("olv:entry:empathy:toggle:done", [d])
+            a.trigger("olv:entry:yeah:toggle:done", [d])
         }).fail(function() {
-            a.trigger("olv:entry:empathy:toggle:fail", [c])
+            a.trigger("olv:entry:yeah:toggle:fail", [c])
         });
         return f
     }
     ,
-    b.Entry.isEmpathyAdded = function(a) {
-        return a.hasClass("empathy-added")
+    b.Entry.isYeahAdded = function(a) {
+        return a.hasClass("yeah-added")
     }
     ,
-    b.Entry.onEmpathyClick = function(c) {
+    b.Entry.onYeahClick = function(c) {
 		if (b.Entry.checkEvent(c)) {
 			if (!c.isDefaultPrevented()) {
 				c.preventDefault();
 				var d = a(this);
-				b.Form.isDisabled(d) || b.Entry.toggleEmpathy(d)
+				b.Form.isDisabled(d) || b.Entry.toggleYeah(d)
 			}
 		}
     }
     ,
-    b.Entry.onEmpathyToggle = function(c, d) {
+    b.Entry.onYeahToggle = function(c, d) {
         var e = a(this);
-        e.toggleClass("empathy-added", d);
+        e.toggleClass("yeah-added", d);
         var f = e.attr("data-feeling") || "normal";
         e.find(".yeah-button-text").text(b.loc("olv.portal.miitoo." + f + (d ? ".delete" : "")));
         var g;
-        g = +e.attr("data-is-in-reply-list") ? e.closest(".reply-meta").find(".empathy-count") : e.closest(".post-meta").find(".empathy-count"),
+        g = +e.attr("data-is-in-reply-list") ? e.closest(".reply-meta").find(".yeah-count") : e.closest(".post-meta").find(".yeah-count"),
         g.text(+g.text() + (d ? 1 : -1));
-        var h = a(document).find("#js-my-empathy-count");
+        var h = a(document).find("#js-my-yeah-count");
         if (h[0] && h.text(+h.text() + (d ? 1 : -1)),
         b.Utils.isIE8AndEarlierStyle) {
-            var i = e.closest(".post-meta").find(".empathy");
+            var i = e.closest(".post-meta").find(".yeah");
             i.addClass("changing"),
             setTimeout(function() {
                 i.removeClass("changing")
@@ -1492,32 +1492,32 @@ var Olv = Olv || {};
         }
     }
     ,
-    b.Entry.setupEmpathyButtons = function(c) {
-        a(document).on("olv:entry:empathy:toggle olv:entry:empathy:toggle:fail", ".yeah-button", b.Entry.onEmpathyToggle),
-        a(document).on("click", ".yeah-button", b.Entry.onEmpathyClick),
+    b.Entry.setupYeahButtons = function(c) {
+        a(document).on("olv:entry:yeah:toggle olv:entry:yeah:toggle:fail", ".yeah-button", b.Entry.onYeahToggle),
+        a(document).on("click", ".yeah-button", b.Entry.onYeahClick),
         c.done(function() {
-            a(document).off("olv:entry:empathy:toggle olv:entry:empathy:toggle:fail", ".yeah-button", b.Entry.onEmpathyToggle),
-            a(document).off("click", ".yeah-button", b.Entry.onEmpathyClick)
+            a(document).off("olv:entry:yeah:toggle olv:entry:yeah:toggle:fail", ".yeah-button", b.Entry.onYeahToggle),
+            a(document).off("click", ".yeah-button", b.Entry.onYeahClick)
         })
     }
     ,
-    b.Entry.setupPostEmpathyButton = function(c) {
+    b.Entry.setupPostYeahButton = function(c) {
         function d(c, d) {
-            b.Entry.onEmpathyToggle.apply(this, arguments);
+            b.Entry.onYeahToggle.apply(this, arguments);
             var e = a(c.target);
             if (!+e.attr("data-is-in-reply-list")) {
-                var f = a("#empathy-content")
-                  , g = +e.closest(".post-meta").find(".empathy-count").text();
+                var f = a("#yeah-content")
+                  , g = +e.closest(".post-meta").find(".yeah-count").text();
                 f.find(".visitor").toggle(d),
                 f.find(".extra").toggle(!d),
                 f.toggleClass("none", 0 === g)
             }
         }
-        a(document).on("olv:entry:empathy:toggle olv:entry:empathy:toggle:fail", ".yeah-button", d),
-        a(document).on("click", ".yeah-button", b.Entry.onEmpathyClick),
+        a(document).on("olv:entry:yeah:toggle olv:entry:yeah:toggle:fail", ".yeah-button", d),
+        a(document).on("click", ".yeah-button", b.Entry.onYeahClick),
         c.done(function() {
-            a(document).off("click", ".yeah-button", b.Entry.onEmpathyClick),
-            a(document).off("olv:entry:empathy:toggle olv:entry:empathy:toggle:fail", ".yeah-button", d)
+            a(document).off("click", ".yeah-button", b.Entry.onYeahClick),
+            a(document).off("olv:entry:yeah:toggle olv:entry:yeah:toggle:fail", ".yeah-button", d)
         })
     }
     ,
@@ -2258,7 +2258,7 @@ var Olv = Olv || {};
 			s.preventDefault();
 			b.Net.go($(this).attr('action') + '?'+$(this).serialize());
 		});
-        b.Entry.setupEmpathyButtons(e);
+        b.Entry.setupYeahButtons(e);
         a("form.search").on("submit", b.Form.validateValueLength);
         var h, i, j = a(".content-loading-window");
         if (j.length) {
@@ -2566,7 +2566,7 @@ mode_post = 0;
         b.Content.autopagerize(".js-post-list", e),
         b.Community.setupPostFilter(e);
         var h = a("#post-form");
-        b.Guest.isGuest() || (b.Entry.setupEmpathyButtons(e),
+        b.Guest.isGuest() || (b.Entry.setupYeahButtons(e),
         b.EntryForm.setupSubmission(h, e),
         b.EntryForm.setupFormStatus(h, e),
         b.EntryForm.setupFoldedForm(h, e),
@@ -2616,7 +2616,7 @@ mode_post = 0;
         b.Content.autopagerize(".js-post-list", e),
         b.Community.setupPostFilter(e);
         var g = a("#post-form");
-        b.Guest.isGuest() || (b.Entry.setupEmpathyButtons(e),
+        b.Guest.isGuest() || (b.Entry.setupYeahButtons(e),
         b.EntryForm.setupSubmission(g, e),
         b.EntryForm.setupFormStatus(g, e),
         b.EntryForm.setupFoldedForm(g, e),
@@ -2644,7 +2644,7 @@ mode_post = 0;
         b.Entry.setupHiddenContents(e),
         b.Entry.setupMoreRepliesButtons(e);
         var h = a("#reply-form");
-        b.Guest.isGuest() || (b.Entry.setupPostEmpathyButton(e),
+        b.Guest.isGuest() || (b.Entry.setupPostYeahButton(e),
         b.Entry.setupEditButtons(e),
         b.EntryForm.setupSubmission(h, e),
         b.EntryForm.setupFormStatus(h, e),
@@ -2807,7 +2807,7 @@ mode_post = 0;
             e.attr("data-is-post") ? b.Form.toggleDisabled(e, !0) : e.remove()
         }
         var g = a("#reply-form");
-        b.Guest.isGuest() || (b.Entry.setupPostEmpathyButton(e),
+        b.Guest.isGuest() || (b.Entry.setupPostYeahButton(e),
         b.Entry.setupEditButtons(e),
         b.EntryForm.setupSubmission(g, e),
         b.EntryForm.setupFormStatus(g, e)),
@@ -2895,7 +2895,7 @@ mode_post = 0;
         b.Entry.setupHiddenContents(e),
         b.Content.autopagerize(".js-post-list", e);
         var i = a("#post-form");
-        b.Guest.isGuest() || (b.Entry.setupEmpathyButtons(e),
+        b.Guest.isGuest() || (b.Entry.setupYeahButtons(e),
         b.EntryForm.setupSubmission(i, e),
         b.EntryForm.setupFormStatus(i, e),
         i.hasClass("for-identified-user") && b.EntryForm.setupIdentifiedUserForm(i, e)),
@@ -3028,7 +3028,7 @@ mode_post = 0;
             a(document).off("olv:report:done", f),
             a(document).off("olv:visitor:following-count:change", g)
         }),
-        b.Entry.setupEmpathyButtons(e)
+        b.Entry.setupYeahButtons(e)
     }),
     b.router.connect("^/users/[^\/]+/favorites$", function(a, c, d) {
         b.Content.autopagerize(".community-list", d)

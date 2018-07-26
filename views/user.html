@@ -1,38 +1,114 @@
 {{if .Pjax}} 
     {{template "header.html" .}}
+{{else}}
+    <title>{{.Title}} - slaj</title>
 {{end}}
-<div id="container">
-    <div id="main-body" class="profile-top" csrf-token="">
-        <div id="sidebar" class="user-sidebar">
-            <div class="sidebar-container">
-                <div id="sidebar-profile-body">
-                    <div class="icon-container">
-                        <a href="/users/{{.User.Username}}"><img src="{{.User.Avatar}}" alt="{{.User.Username}}" class="icon"></a>
-                    </div>
-                    <a href="/users/{{.User.Username}}" class="nick-name" style="color:{{.User.Color}}">{{.User.Nickname}}</a>
-                    <p class="id-name">{{.User.Username}}</p>
-                </div>
-                <div class="user-action-content">
-                    <div class="toggle-button">
-                        <button type="button" data-action="/users/{{.User.Username}}/follow" class="follow-button button symbol">Follow</button>
-                    </div>
-                </div>
-            </div>
-            <div class="sidebar-setting sidebar-container">
-                <div class="sidebar-post-menu">
-                    <a href="/users/{{.User.Username}}/posts" class="sidebar-menu-post with-count symbol"><span>All posts</span><span class="post-count"><span class="test-post-count">placeholder</span></a>
-                    <a href="/users/{{.User.Username}}/comments" class="sidebar-menu-replies with-count symbol"><span>All comments</span><span class="post-count"><span class="test-reply-count">placeholder</span></a>
-                    <a href="/users/{{.User.Username}}/yeahs" class="sidebar-menu-empathies with-count symbol"><span>Yeahs given</span><span class="post-count"><span class="test-empathy-count">placeholder</span></a>
-                </div>
-            </div>
-            <div class="sidebar-container sidebar-profile">
-                <div class="profile-comment">
-                    <p class="js-truncated-text">
-                        todo: add profile assets
-                    </p>
+<div id="main-body" class="profile-top" csrf-token="">
+    {{template "profile_sidebar.html" .}}
+    <div class="main-column">
+        <div class="post-list-outline">
+            <h2 class="label">Recent posts</h2>
+            <div class="post-body">
+                <div class="list multi-timeline-post-list">
+                    {{$user := .User}}
+                    {{$current_user_id := .CurrentUser.ID}}
+                    {{range $post := .Posts}}
+                        <div id="{{$post.ID}}" data-href="/posts/{{$post.ID}}" class="post trigger{{if $post.Image}} with-image{{end}}" tabindex="0">
+                            <p class="community-container"><a href="/communities/{{$post.CommunityID}}"><img src="{{$post.CommunityIcon}}" class="community-icon">{{$post.CommunityName}}</a></p>
+                            <div class="body">
+                                <div class="post-content">
+                                    <a href="/users/{{$user.Username}}" username="{{$user.Username}}" class="icon-container
+                                    {{if $user.Online}}
+                                        online
+                                    {{else}}
+                                        offline
+                                    {{end}}
+                                    ">
+                                        <img src="{{$user.Avatar}}" class="icon">
+                                    </a>
+                                    <p class="user-name"><a href="/users/{{$user.Username}}">{{$user.Nickname}}</a></p>
+                                    <p class="timestamp-container">
+                                        <a class="timestamp" href="/posts/{{$post.ID}}">{{$post.CreatedAt}}</a>
+                                    </p>
+                                    {{if $post.Image}}
+                                        <a href="/posts/{{$post.ID}}" class="screenshot-container still-image">
+                                            <img src="{{$post.Image}}">
+                                        </a>
+                                    {{end}}
+                                    <p class="post-content-text">{{$post.Body}}</p>
+                                    <div class="post-meta">
+                                        <button type="button" {{if eq $user.ID $current_user_id}} disabled{{end}} class="symbol submit yeah-button
+                                        {{if $post.Yeahed}} yeah-added{{end}}
+                                        {{if eq $user.ID $current_user_id}} disabled{{end}}
+                                        " data-feeling="" data-action="/posts/{{$post.ID}}/yeah" data-community-id="" data-url-id="{{$post.ID}}"><span class="yeah-button-text">
+                                        {{if $post.Yeahed}}
+                                            Unyeah
+                                        {{else}}
+                                            Yeah!
+                                        {{end}}
+                                        </span></button>
+                                        <div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">{{$post.YeahCount}}</span></div>
+                                        <div class="reply symbol"><span class="symbol-label">Comments</span><span class="reply-count">{{$post.CommentCount}}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {{end}}
                 </div>
             </div>
         </div>
+        <a class="big-button" href="/users/{{.User.Username}}/posts">View posts</a>
+        <div class="post-list-outline">
+            <h2 class="label">Recently yeahed posts</h2>
+            <div class="post-body">
+                <div class="list multi-timeline-post-list">
+                    {{$current_user_id := .CurrentUser.ID}}
+                    {{range $post := .Yeahs}}
+                        <div id="{{$post.ID}}" data-href="/posts/{{$post.ID}}" class="post trigger{{if $post.Image}} with-image{{end}}" tabindex="0">
+                            <p class="community-container"><a href="/communities/{{$post.CommunityID}}"><img src="{{$post.CommunityIcon}}" class="community-icon">{{$post.CommunityName}}</a></p>
+                            <div class="body">
+                                <div class="post-content">
+                                    <a href="/users/{{$post.PosterUsername}}" username="{{$post.PosterUsername}}" class="icon-container
+                                    {{if $post.PosterOnline}}
+                                        online
+                                    {{else}}
+                                        offline
+                                    {{end}}
+                                    ">
+                                        <img src="{{$post.PosterIcon}}" class="icon">
+                                    </a>
+                                    <p class="user-name"><a href="/users/{{$post.PosterUsername}}">{{$post.PosterNickname}}</a></p>
+                                    <p class="timestamp-container">
+                                        <a class="timestamp" href="/posts/{{$post.ID}}">{{$post.CreatedAt}}</a>
+                                    </p>
+                                    {{if $post.Image}}
+                                        <a href="/posts/{{$post.ID}}" class="screenshot-container still-image">
+                                            <img src="{{$post.Image}}">
+                                        </a>
+                                    {{end}}
+                                    <p class="post-content-text">{{$post.Body}}</p>
+                                    <div class="post-meta">
+                                        <button type="button" {{if eq $post.CreatedBy $current_user_id}} disabled{{end}} class="symbol submit yeah-button
+                                        {{if $post.Yeahed}} yeah-added{{end}}
+                                        {{if eq $post.CreatedBy $current_user_id}} disabled{{end}}
+                                        " data-feeling="" data-action="/posts/{{$post.ID}}/yeah" data-community-id="" data-url-id="{{$post.ID}}"><span class="yeah-button-text">
+                                        {{if $post.Yeahed}}
+                                            Unyeah
+                                        {{else}}
+                                            Yeah!
+                                        {{end}}
+                                        </span></button>
+                                        <div class="yeah symbol"><span class="symbol-label">Yeahs</span><span class="yeah-count">{{$post.YeahCount}}</span></div>
+                                        <div class="reply symbol"><span class="symbol-label">Comments</span><span class="reply-count">{{$post.CommentCount}}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+        <a class="big-button" href="/users/{{.User.Username}}/yeahs">View all yeahs</a>
     </div>
 </div>
 {{if .Pjax}}

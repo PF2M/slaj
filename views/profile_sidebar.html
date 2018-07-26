@@ -1,0 +1,89 @@
+<div id="sidebar" class="user-sidebar">
+     <div class="sidebar-container">
+         <div id="sidebar-profile-body">
+             <div username="{{.User.Username}}" class="icon-container
+             {{if .User.Online}}
+                 online
+             {{else}}
+                 offline
+             {{end}}
+             ">
+                 <a href="/users/{{.User.Username}}"><img src="{{.User.Avatar}}" alt="{{.User.Username}}" class="icon"></a>
+             </div>
+             <a href="/users/{{.User.Username}}" class="nick-name" style="color:{{.User.Color}}">{{.User.Nickname}}</a>
+             <p class="id-name">{{.User.Username}}</p>
+         </div>
+         {{if not (eq .User.ID .CurrentUser.ID)}}
+             <div class="user-action-content">
+                 <div class="toggle-button">
+                     <button type="button" data-action="/users/{{.User.Username}}/follow" class="follow-button button symbol{{if .Following}} none{{end}}">Follow</button>
+                     <button type="button" data-action="/users/{{.User.Username}}/unfollow" class="unfollow-button button symbol{{if not .Following}} none{{end}}" data-screen-name="{{.User.Nickname}}">Follow</button>
+                </div>
+            </div>
+        {{end}}
+        <ul id="sidebar-profile-status">
+            <li><a href="/users/{{.User.Username}}/following" class=""><span><span class="number test-following-count">{{$.Profile.FollowingCount}}</span>Following</span></a></li>
+            <li><a href="/users/{{.User.Username}}/followers" class=""><span><span class="number test-follower-count">{{$.Profile.FollowerCount}}</span>Followers</span></a></li>
+        </ul>
+    </div>
+    <div class="sidebar-setting sidebar-container">
+        <div class="sidebar-post-menu">
+            <a href="/users/{{.User.Username}}/posts" class="sidebar-menu-post with-count symbol"><span>All posts</span><span class="post-count"><span class="test-post-count">{{$.Profile.PostCount}}</span></a>
+            <a href="/users/{{.User.Username}}/comments" class="sidebar-menu-replies with-count symbol"><span>All comments</span><span class="post-count"><span class="test-reply-count">{{$.Profile.CommentCount}}</span></a>
+            <a href="/users/{{.User.Username}}/yeahs" class="sidebar-menu-empathies with-count symbol"><span>Yeahs given</span><span class="post-count"><span class="test-empathy-count">{{$.Profile.YeahCount}}</span></a>
+        </div>
+    </div>
+    <div class="sidebar-container sidebar-profile">
+        {{if .Profile.Comment}}
+        <div class="profile-comment">
+            <p class="js-truncated-text">
+                {{.Profile.Comment}}
+            </p>
+        </div>
+        {{end}}
+        <div class="user-data">
+            {{if .Profile.Region}}
+            <div class="data-content">
+                <h4><span>Region</span></h4>
+                <div class="note">
+                    <span>{{.Profile.Region}}</span>
+                </div>
+            </div>
+            {{end}}
+            {{if .Profile.NNID}}
+            <div class="data-content">
+                <h4><span>NNID</span></h4>
+                <div class="note">
+                    <span>{{.Profile.NNID}}</span>
+                </div>
+            </div>
+            {{end}}
+            <div class="data-content">
+                <h4><span>User ID</span></h4>
+                <div class="note">
+                    <span>#{{.User.ID}}</span>
+                </div>
+            </div>
+            <div class="data-content">
+                <h4><span>Date joined</span></h4>
+                <div class="note">
+                    <span>{{.Profile.CreatedAt}}</span>
+                </div>
+            </div>
+            <div class="data-content">
+                <h4><span>Last seen</span></h4>
+                <div class="note">
+                    <span>{{.User.LastSeen}}</span>
+                </div>
+            </div>
+            {{if .Profile.Gender}}
+            <div class="data-content">
+                <h4><span>Preferred pronoun</span></h4>
+                <div class="note">
+                    <span>{{.Profile.Gender}}</span>
+                </div>
+            </div>
+            {{end}}
+        </div>
+    </div>
+</div>

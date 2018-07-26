@@ -1,9 +1,0 @@
-{
-    "database": {
-        "address": "127.0.0.1:3306",
-        "username": "root",
-        "password": "root",
-        "database": "slaj"
-    },
-    "port": 8080
-}
